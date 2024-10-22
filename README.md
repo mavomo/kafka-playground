@@ -2,8 +2,8 @@
 
 Side project done with Mickaël in order to play with Kafka and other EDA stack tech
 
-Scope : En tant que client, je veux sélectionner des produits et les mettre dans un chariot.
-Une API externe donne sur la page des commandes, le stock restant pour ce produit.
+Scope [Généré par Miro.AI] : Système de gestion des stocks intégrant des alertes de stock en temps réel et une visualisation. 
+Ce système vise à rationaliser la supervision des stocks, réduire les ruptures de stock et améliorer l'efficacité opérationnelle globale.
 
 ## TODO List N°1
 
@@ -25,7 +25,6 @@ Une API externe donne sur la page des commandes, le stock restant pour ce produi
 - Setup fly.io environment to deploy Spring app []
 
 ## Backlog
-
 - BDD Redis
 - Observabilité/monitoring/alerting
- 	Prometheus/grafana
+ 	- Prometheus/grafana
