@@ -28,3 +28,11 @@ Ce système vise à rationaliser la supervision des stocks, réduire les rupture
 - BDD Redis
 - Observabilité/monitoring/alerting
  	- Prometheus/grafana
+
+
+### How to build
+
+> docker build -t kafka-playground-app . 
+
+### How to run
+> docker run -d --name kafka-playground-app -p 8080:8080 kafka-playground-app:latest
