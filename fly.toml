@@ -1,5 +1,5 @@
 app = "kafka-playground"
-primary_region = "Paris, France"
+primary_region = "cdg"
 
 [build]
 dockerfile = "Dockerfile"
