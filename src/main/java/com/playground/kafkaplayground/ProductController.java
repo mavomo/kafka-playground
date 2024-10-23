@@ -1,5 +1,6 @@
 package com.playground.kafkaplayground;
 
+import com.playground.kafkaplayground.domain.Product;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
