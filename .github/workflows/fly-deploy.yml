@@ -1,28 +1,22 @@
-name: Deploy to Fly.io
-
+name: Build & deploy to Fly.io
 on:
   push:
     branches:
       - 'main'
-
 env:
   FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-
 jobs:
   deploy:
-    name: Deploy to Fly.io
-
+    name: Build & deploy to Fly.io
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
-
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
-          cache: gradle
+          cache: 'gradle'
 
       - name: Build and test with Gradle
         run: ./gradlew build
@@ -31,4 +25,6 @@ jobs:
         uses: superfly/flyctl-actions/setup-flyctl@master
 
       - name: Deploy to Fly.io
-        run: flyctl deploy --remote-only
+        run: |
+          echo "$FLY_API_TOKEN" | flyctl auth import
+          flyctl deploy --remote-only
