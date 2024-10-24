@@ -1,4 +1,4 @@
-package com.playground.kafkaplayground.domain;
+package com.playground.kafkaplayground.products.domain;
 
 public record Product(
         Long id,
