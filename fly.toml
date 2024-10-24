@@ -9,3 +9,8 @@ internal_port = 8080
 force_https = true
 auto_stop_machines = true
 auto_start_machines = true
+
+[[vm]]
+size = "shared-cpu-8x"
+memory = "2gb"
+
