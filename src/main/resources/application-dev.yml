@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: kafka-playground
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+    properties:
+      sasl:
+        mechanism: ${KAFKA_SASL_MECHANISM}
+        jaas:
+          config: ${KAFKA_JAAS}
+      security:
+        protocol: ${KAFKA_SECURITY_PROTOCOL}
+      session:
+        timeout:
+          ms: 45000
+client:
+  id: ${KAFKA_ADMIN_CLIENT_ID}
