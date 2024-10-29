@@ -1,6 +1,8 @@
 spring:
   application:
     name: kafka-playground
+  config:
+    import: optional:file:.env
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
     properties:
