@@ -17,7 +17,7 @@ public class OrderController {
 
     @PostMapping
     public ResponseEntity<String> createOrder(@RequestBody Order order) {
-        var orderId = String.join("", "api/orders/", order.id());
+        var orderId = String.join("", "api/orders/", order.id().toString());
         orders.put(orderId, order);
         return ResponseEntity.created(URI.create(orderId)).build();
     }

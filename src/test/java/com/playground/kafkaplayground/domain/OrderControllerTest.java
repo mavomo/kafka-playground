@@ -39,7 +39,7 @@ class OrderControllerTest {
         var price = new Price(BigDecimal.valueOf(100), Currency.getInstance("USD"));
         var product = new Product(1L, "Product 1", price);
 
-        var request = new Order("ref-123", orderCreateAt,
+        var request = new Order(123L, orderCreateAt,
                 List.of(new Order.OrderItem(product, 1)));
 
         var requestJson = objectMapper.writeValueAsString(request);
@@ -47,7 +47,7 @@ class OrderControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
                 .andExpect(status().isCreated())
-                .andExpect(header().string("Location", containsString("api/orders/ref-123")));
+                .andExpect(header().string("Location", containsString("api/orders/123")));
     }
 
     @Test
@@ -58,7 +58,7 @@ class OrderControllerTest {
         var price = new Price(BigDecimal.valueOf(100), Currency.getInstance("USD"));
         var product = new Product(1L, "Product 1", price);
 
-        var request = new Order("ref-123", orderCreateAt,
+        var request = new Order(123L, orderCreateAt,
                 List.of(new Order.OrderItem(product, 1)));
 
         var requestJson = objectMapper.writeValueAsString(request);
@@ -73,7 +73,7 @@ class OrderControllerTest {
                 .getContentAsString();
 
         Assertions.assertThat(orders).isEqualTo("""
-                [{"id":"ref-123","orderedAt":"2024-10-24T12:02:00","items":[{"product":{"id":1,"name":"Product 1","price":{"amount":100,"currency":"USD"}},"quantity":1}]}]
+                [{"id":123,"orderedAt":"2024-10-24T12:02:00","items":[{"product":{"id":1,"name":"Product 1","price":{"amount":100,"currency":"USD"}},"quantity":1}]}]
                 """.trim());
     }
 
