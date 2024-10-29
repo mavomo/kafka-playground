@@ -9,7 +9,10 @@ spring:
       sasl:
         mechanism: ${KAFKA_SASL_MECHANISM}
         jaas:
-          config: ${KAFKA_JAAS}
+          config: |
+            org.apache.kafka.common.security.plain.PlainLoginModule required
+            username='${KAFKA_JAAS_USERNAME}'
+            password='${KAFKA_JAAS_PASSWORD}';
       security:
         protocol: ${KAFKA_SECURITY_PROTOCOL}
       session:
