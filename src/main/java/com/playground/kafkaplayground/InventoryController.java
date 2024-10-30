@@ -6,8 +6,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.UUID;
-
 @RestController
 @RequestMapping("/api/inventory")
 public class InventoryController {
@@ -18,9 +16,9 @@ public class InventoryController {
         this.inventoryService = inventoryService;
     }
 
-    @PostMapping("hello")
-    public ResponseEntity<String> helloInventory() {
-        inventoryService.sendMessage("dev.playground.inventory.created", UUID.randomUUID().toString(), "hello inventory");
+    @PostMapping("/initialize")
+    public ResponseEntity<String> initializeInventory() {
+        inventoryService.initialize();
         return ResponseEntity.ok().build();
     }
 }
