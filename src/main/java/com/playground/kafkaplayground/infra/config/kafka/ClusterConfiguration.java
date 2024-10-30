@@ -1,4 +1,4 @@
-package com.playground.kafkaplayground.infra.config;
+package com.playground.kafkaplayground.infra.config.kafka;
 
 import com.fasterxml.jackson.databind.JsonSerializer;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -36,8 +36,8 @@ public class ClusterConfiguration<K, V> {
         configProps.put(ProducerConfig.ACKS_CONFIG, kafkaProperties.getAcks());
         configProps.put(ProducerConfig.RETRIES_CONFIG, kafkaProperties.getRetries());
         configProps.put(ProducerConfig.BATCH_SIZE_CONFIG, kafkaProperties.getBatchSize());
-        configProps.put(ProducerConfig.LINGER_MS_CONFIG, kafkaProperties.getLingerMs());
-        configProps.put(ProducerConfig.BUFFER_MEMORY_CONFIG, kafkaProperties.getProducer().);
+        configProps.put(ProducerConfig.LINGER_MS_CONFIG, kafkaProperties.getLingerMemory());
+        configProps.put(ProducerConfig.BUFFER_MEMORY_CONFIG, kafkaProperties.getMemoryConfig());
 
         return new DefaultKafkaProducerFactory<>(configProps);
     }

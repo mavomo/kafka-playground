@@ -1,11 +1,10 @@
-package com.playground.kafkaplayground.infra.config;
+package com.playground.kafkaplayground.infra.config.kafka;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 
 @ConfigurationProperties(prefix = "kafka")
-@Configuration
 public class KafkaProperties {
+    private String applicationName;
     private String bootstrapServers;
     private String groupId;
     private Producer producer;
@@ -23,11 +22,23 @@ public class KafkaProperties {
         return this.producer.getBatchSize();
     }
 
-    public Integer getLingerMs() {
+    public Integer getLingerMemory() {
         return this.producer.getLingerMs();
     }
 
+    public Integer getMemoryConfig() {
+        return this.producer.getMemoryConfig();
+    }
+
     public static class Producer {
+        private String keySerializer;
+        private String valueSerializer;
+        private String acks;
+        private Integer retries;
+        private Integer batchSize;
+        private Integer lingerMs;
+        private Integer memoryConfig;
+
         public String getKeySerializer() {
             return keySerializer;
         }
@@ -71,17 +82,18 @@ public class KafkaProperties {
         public Integer getLingerMs() {
             return lingerMs;
         }
-
         public void setLingerMs(Integer lingerMs) {
             this.lingerMs = lingerMs;
         }
 
-        private String keySerializer;
-        private String valueSerializer;
-        private String acks;
-        private Integer retries;
-        private Integer batchSize;
-        private Integer lingerMs;
+
+        public Integer getMemoryConfig() {
+            return memoryConfig;
+        }
+
+        public void setMemoryConfig(Integer memoryConfig) {
+            this.memoryConfig = memoryConfig;
+        }
     }
 
     public static class Consumer {
@@ -112,6 +124,14 @@ public class KafkaProperties {
         public void setAutoOffsetReset(String autoOffsetReset) {
             this.autoOffsetReset = autoOffsetReset;
         }
+    }
+
+    public String getApplicationName() {
+        return applicationName;
+    }
+
+    public void setApplicationName(String applicationName) {
+        this.applicationName = applicationName;
     }
 
     public Consumer getConsumer() {
