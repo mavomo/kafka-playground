@@ -1,9 +1,7 @@
 package com.playground.kafkaplayground.infra.config.kafka;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
-import org.springframework.context.annotation.Configuration;
 
 @ConfigurationProperties(prefix = "spring.kafka")
 public class KafkaProperties {
@@ -33,7 +31,7 @@ public class KafkaProperties {
     }
 
     public Integer getMemoryConfig() {
-        return this.producer.getMemoryConfig();
+        return this.producer.getBufferMemory();
     }
 
     public static class Producer {
@@ -42,9 +40,8 @@ public class KafkaProperties {
         private String acks;
         private Integer retries;
         private Integer batchSize;
-        @Value("linger-ms")
         private Integer lingerMs;
-        private Integer memoryConfig;
+        private Integer bufferMemory;
 
         public String getKeySerializer() {
             return keySerializer;
@@ -95,12 +92,12 @@ public class KafkaProperties {
         }
 
 
-        public Integer getMemoryConfig() {
-            return memoryConfig;
+        public Integer getBufferMemory() {
+            return bufferMemory;
         }
 
-        public void setMemoryConfig(Integer memoryConfig) {
-            this.memoryConfig = memoryConfig;
+        public void setBufferMemory(Integer bufferMemory) {
+            this.bufferMemory = bufferMemory;
         }
     }
 
