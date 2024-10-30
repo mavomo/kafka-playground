@@ -24,7 +24,7 @@ spring:
       batch-size: 16384
       buffer-memory: 33554432
       linger-ms: 1
-      key-serializer: org.springframework.kafka.support.serializer.StringSerializer
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 client:
   id: ${KAFKA_ADMIN_CLIENT_ID}
