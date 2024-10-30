@@ -1,14 +1,20 @@
 package com.playground.kafkaplayground.infra.config.kafka;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
+import org.springframework.context.annotation.Configuration;
 
-@ConfigurationProperties(prefix = "kafka")
+@ConfigurationProperties(prefix = "spring.kafka")
 public class KafkaProperties {
     private String applicationName;
     private String bootstrapServers;
-    private String groupId;
-    private Producer producer;
-    private Consumer consumer;
+
+    @NestedConfigurationProperty
+    private Producer producer = new Producer();
+
+    @NestedConfigurationProperty
+    private Consumer consumer = new Consumer();
 
     public String getAcks() {
         return this.producer.getAcks();
@@ -36,6 +42,7 @@ public class KafkaProperties {
         private String acks;
         private Integer retries;
         private Integer batchSize;
+        @Value("linger-ms")
         private Integer lingerMs;
         private Integer memoryConfig;
 
@@ -82,6 +89,7 @@ public class KafkaProperties {
         public Integer getLingerMs() {
             return lingerMs;
         }
+
         public void setLingerMs(Integer lingerMs) {
             this.lingerMs = lingerMs;
         }
@@ -148,14 +156,6 @@ public class KafkaProperties {
 
     public void setBootstrapServers(String bootstrapServers) {
         this.bootstrapServers = bootstrapServers;
-    }
-
-    public String getGroupId() {
-        return groupId;
-    }
-
-    public void setGroupId(String groupId) {
-        this.groupId = groupId;
     }
 
     public Producer getProducer() {

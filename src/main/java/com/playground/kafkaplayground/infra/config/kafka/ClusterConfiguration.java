@@ -1,6 +1,9 @@
 package com.playground.kafkaplayground.infra.config.kafka;
 
 import com.fasterxml.jackson.databind.JsonSerializer;
+import com.playground.kafkaplayground.ProductService;
+import com.playground.kafkaplayground.domain.Inventory;
+import com.playground.kafkaplayground.infra.InventoryService;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -9,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
+import org.springframework.kafka.support.LoggingProducerListener;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -44,7 +48,10 @@ public class ClusterConfiguration<K, V> {
 
     @Bean
     public KafkaTemplate<K, V> kafkaTemplate() {
-        return new KafkaTemplate<>(producerFactory());
+        ProducerFactory<K, V> kvProducerFactory = producerFactory();
+        KafkaTemplate<K, V> kafkaTemplate = new KafkaTemplate<>(kvProducerFactory);
+        kafkaTemplate.setProducerListener(new LoggingProducerListener<>());
+        return kafkaTemplate;
     }
 
 }

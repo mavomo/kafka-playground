@@ -3,6 +3,8 @@ package com.playground.kafkaplayground.infra;
 import com.playground.kafkaplayground.ProductService;
 import com.playground.kafkaplayground.domain.Inventory;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -14,16 +16,12 @@ public class InventoryService {
     private static final String TOPIC_NAME = "dev.playground.inventory.created";
     private static final Long DEFAULT_PRODUCT_QUANTITY = 10L;
 
-    private final KafkaTemplate<String, Inventory> kafkaTemplate;
-    private final ProductService productService;
+    @Autowired
+    private KafkaTemplate<String, Inventory> kafkaTemplate;
 
-    public InventoryService(
-            KafkaTemplate<String, Inventory> kafkaTemplate,
-            ProductService productService
-    ) {
-        this.kafkaTemplate = kafkaTemplate;
-        this.productService = productService;
-    }
+    @Autowired
+    private ProductService productService;
+
 
     public void initialize() {
         productService.products().forEach(product -> {
