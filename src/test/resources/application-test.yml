@@ -1,20 +1,18 @@
 spring:
   application:
-    name: kafka-playground
-  config:
-    import: optional:file:.env
+    name: kafka-playground-test
   kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+    bootstrap-servers: bootstrapserver
     properties:
       sasl:
-        mechanism: ${KAFKA_SASL_MECHANISM}
+        mechanism: mechanims
         jaas:
           config: |
             org.apache.kafka.common.security.plain.PlainLoginModule required
             username='${KAFKA_JAAS_USERNAME}'
             password='${KAFKA_JAAS_PASSWORD}';
       security:
-        protocol: ${KAFKA_SECURITY_PROTOCOL}
+        protocol: sasls
       session:
         timeout:
           ms: 45000
@@ -27,4 +25,4 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 client:
-  id: ${KAFKA_ADMIN_CLIENT_ID}
+  id: client-test

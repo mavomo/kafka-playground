@@ -17,10 +17,7 @@ public class InventoryService {
     private final KafkaTemplate<String, Inventory> kafkaTemplate;
     private final ProductService productService;
 
-    public InventoryService(
-            KafkaTemplate<String, Inventory> kafkaTemplate,
-            ProductService productService
-    ) {
+    public InventoryService(KafkaTemplate<String, Inventory> kafkaTemplate, ProductService productService) {
         this.kafkaTemplate = kafkaTemplate;
         this.productService = productService;
     }

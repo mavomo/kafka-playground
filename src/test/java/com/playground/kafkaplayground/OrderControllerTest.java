@@ -1,12 +1,12 @@
-package com.playground.kafkaplayground.domain;
+package com.playground.kafkaplayground;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.playground.kafkaplayground.domain.Order;
+import com.playground.kafkaplayground.domain.Product;
 import com.playground.kafkaplayground.domain.Product.Price;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -22,9 +22,9 @@ import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+@TestConfigurationIT
 class OrderControllerTest {
+
     @Autowired
     private MockMvc mockMvc;
 
