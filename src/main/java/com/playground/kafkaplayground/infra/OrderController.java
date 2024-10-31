@@ -11,7 +11,6 @@ import java.util.List;
 @RequestMapping("/api/orders")
 public class OrderController {
 
-
     private final OrderService orderService;
 
     public OrderController(OrderService orderService) {
@@ -22,12 +21,12 @@ public class OrderController {
     public ResponseEntity<String> createOrder(@RequestBody OrderToBeTreated order) {
         String orderId = orderService.createOrder(order);
         var location = String.join("", "api/orders/", orderId);
-
         return ResponseEntity.created(URI.create(location)).build();
     }
 
     @GetMapping
-    public ResponseEntity<List<OrderToBeTreated>> getAllOrders() {
-        return ResponseEntity.ok(List.of());
+    public ResponseEntity<List<OrderTreated>> getAllOrders() {
+        List<OrderTreated> orders = orderService.getOrders();
+        return ResponseEntity.ok(orders);
     }
 }
