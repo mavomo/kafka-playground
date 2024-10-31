@@ -1,12 +1,11 @@
-package com.playground.kafkaplayground;
+package com.playground.kafkaplayground.infra;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.playground.kafkaplayground.TestConfigurationIT;
 import com.playground.kafkaplayground.domain.OrderItem;
 import com.playground.kafkaplayground.domain.OrderToBeTreated;
 import com.playground.kafkaplayground.domain.Product;
 import com.playground.kafkaplayground.domain.Product.Price;
-import com.playground.kafkaplayground.infra.OrderService;
-import com.playground.kafkaplayground.infra.OrderTreated;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

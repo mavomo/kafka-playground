@@ -1,7 +1,8 @@
-package com.playground.kafkaplayground;
+package com.playground.kafkaplayground.infra;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
+import com.playground.kafkaplayground.TestConfigurationIT;
 import com.playground.kafkaplayground.domain.Product;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
