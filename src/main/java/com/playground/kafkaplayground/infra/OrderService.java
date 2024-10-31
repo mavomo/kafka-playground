@@ -15,13 +15,13 @@ import java.util.UUID;
 public class OrderService {
 
     private static final String ORDER_TOPIC_NAME = "dev.playground.order.treated";
+
     private final Map<String, OrderTreated> orders = new HashMap<>();
     private final KafkaTemplate<String, OrderTreated> kafkaTemplate;
 
     public OrderService(KafkaTemplate<String, OrderTreated> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
     }
-
 
     public List<OrderTreated> getOrders() {
         return orders.values().stream().toList();
