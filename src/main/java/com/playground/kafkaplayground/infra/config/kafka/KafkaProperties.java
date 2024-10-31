@@ -3,10 +3,15 @@ package com.playground.kafkaplayground.infra.config.kafka;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
-@ConfigurationProperties(prefix = "spring.kafka")
+@ConfigurationProperties(prefix = "kafka")
 public class KafkaProperties {
     private String applicationName;
     private String bootstrapServers;
+    private String saslMechanism;
+    private String jaasUsername;
+    private String jaasPassword;
+    private String securityProtocol;
+    private int sessionTimeoutMs;
 
     @NestedConfigurationProperty
     private Producer producer = new Producer();
@@ -14,24 +19,76 @@ public class KafkaProperties {
     @NestedConfigurationProperty
     private Consumer consumer = new Consumer();
 
-    public String getAcks() {
-        return this.producer.getAcks();
+    public String getApplicationName() {
+        return applicationName;
     }
 
-    public Integer getRetries() {
-        return this.producer.getRetries();
+    public String getBootstrapServers() {
+        return bootstrapServers;
     }
 
-    public Integer getBatchSize() {
-        return this.producer.getBatchSize();
+    public String getSaslMechanism() {
+        return saslMechanism;
     }
 
-    public Integer getLingerMemory() {
-        return this.producer.getLingerMs();
+    public String getJaasUsername() {
+        return jaasUsername;
     }
 
-    public Integer getMemoryConfig() {
-        return this.producer.getBufferMemory();
+    public String getJaasPassword() {
+        return jaasPassword;
+    }
+
+    public String getSecurityProtocol() {
+        return securityProtocol;
+    }
+
+    public int getSessionTimeoutMs() {
+        return sessionTimeoutMs;
+    }
+
+    public Producer getProducer() {
+        return producer;
+    }
+
+    public Consumer getConsumer() {
+        return consumer;
+    }
+
+    public void setApplicationName(String applicationName) {
+        this.applicationName = applicationName;
+    }
+
+    public void setBootstrapServers(String bootstrapServers) {
+        this.bootstrapServers = bootstrapServers;
+    }
+
+    public void setSaslMechanism(String saslMechanism) {
+        this.saslMechanism = saslMechanism;
+    }
+
+    public void setJaasUsername(String jaasUsername) {
+        this.jaasUsername = jaasUsername;
+    }
+
+    public void setJaasPassword(String jaasPassword) {
+        this.jaasPassword = jaasPassword;
+    }
+
+    public void setSecurityProtocol(String securityProtocol) {
+        this.securityProtocol = securityProtocol;
+    }
+
+    public void setSessionTimeoutMs(int sessionTimeoutMs) {
+        this.sessionTimeoutMs = sessionTimeoutMs;
+    }
+
+    public void setProducer(Producer producer) {
+        this.producer = producer;
+    }
+
+    public void setConsumer(Consumer consumer) {
+        this.consumer = consumer;
     }
 
     public static class Producer {
@@ -129,37 +186,5 @@ public class KafkaProperties {
         public void setAutoOffsetReset(String autoOffsetReset) {
             this.autoOffsetReset = autoOffsetReset;
         }
-    }
-
-    public String getApplicationName() {
-        return applicationName;
-    }
-
-    public void setApplicationName(String applicationName) {
-        this.applicationName = applicationName;
-    }
-
-    public Consumer getConsumer() {
-        return consumer;
-    }
-
-    public void setConsumer(Consumer consumer) {
-        this.consumer = consumer;
-    }
-
-    public String getBootstrapServers() {
-        return bootstrapServers;
-    }
-
-    public void setBootstrapServers(String bootstrapServers) {
-        this.bootstrapServers = bootstrapServers;
-    }
-
-    public Producer getProducer() {
-        return producer;
-    }
-
-    public void setProducer(Producer producer) {
-        this.producer = producer;
     }
 }
