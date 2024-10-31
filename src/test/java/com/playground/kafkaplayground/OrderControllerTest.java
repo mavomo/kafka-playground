@@ -1,7 +1,7 @@
 package com.playground.kafkaplayground;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.playground.kafkaplayground.domain.Order;
+import com.playground.kafkaplayground.domain.OrderToBeTreated;
 import com.playground.kafkaplayground.domain.Product;
 import com.playground.kafkaplayground.domain.Product.Price;
 import org.assertj.core.api.Assertions;
@@ -19,6 +19,7 @@ import java.util.Currency;
 import java.util.List;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.startsWith;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -33,33 +34,29 @@ class OrderControllerTest {
 
     @Test
     public void should_create_order() throws Exception {
-
-        var orderCreateAt = LocalDateTime.now();
-
         var price = new Price(BigDecimal.valueOf(100), Currency.getInstance("USD"));
         var product = new Product(1L, "Product 1", price);
 
-        var request = new Order(123L, orderCreateAt,
-                List.of(new Order.OrderItem(product, 1)));
+        OrderToBeTreated orderRequest = new OrderToBeTreated(
+                List.of(
+                        new OrderToBeTreated.OrderItem(product, 1))
+        );
 
-        var requestJson = objectMapper.writeValueAsString(request);
+        var requestJson = objectMapper.writeValueAsString(orderRequest);
         mockMvc.perform(MockMvcRequestBuilders.post("/api/orders")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
                 .andExpect(status().isCreated())
-                .andExpect(header().string("Location", containsString("api/orders/123")));
+                .andExpect(header().string("Location", startsWith("api/orders/ref-kfk-")));
     }
 
     @Test
     public void should_retrieve_orders() throws Exception {
-
-        var orderCreateAt = LocalDateTime.of(LocalDate.of(2024, 10, 24), LocalTime.of(12, 02));
-
         var price = new Price(BigDecimal.valueOf(100), Currency.getInstance("USD"));
         var product = new Product(1L, "Product 1", price);
 
-        var request = new Order(123L, orderCreateAt,
-                List.of(new Order.OrderItem(product, 1)));
+        var request = new OrderToBeTreated(
+                List.of(new OrderToBeTreated.OrderItem(product, 1)));
 
         var requestJson = objectMapper.writeValueAsString(request);
         mockMvc.perform(MockMvcRequestBuilders.post("/api/orders")
