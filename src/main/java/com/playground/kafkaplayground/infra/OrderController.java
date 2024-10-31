@@ -1,29 +1,32 @@
 package com.playground.kafkaplayground.infra;
 
-import com.playground.kafkaplayground.domain.Order;
+import com.playground.kafkaplayground.domain.OrderToBeTreated;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/orders")
 public class OrderController {
 
-    private final Map<String, Order> orders = new HashMap<>();
+    private final OrderService orderService;
+
+    public OrderController(OrderService orderService) {
+        this.orderService = orderService;
+    }
 
     @PostMapping
-    public ResponseEntity<String> createOrder(@RequestBody Order order) {
-        var orderId = String.join("", "api/orders/", order.id().toString());
-        orders.put(orderId, order);
-        return ResponseEntity.created(URI.create(orderId)).build();
+    public ResponseEntity<String> createOrder(@RequestBody OrderToBeTreated order) {
+        String orderId = orderService.createOrder(order);
+        var location = String.join("", "api/orders/", orderId);
+        return ResponseEntity.created(URI.create(location)).build();
     }
 
     @GetMapping
-    public ResponseEntity<List<Order>> getAllOrders() {
-        return ResponseEntity.ok(orders.values().stream().toList());
+    public ResponseEntity<List<OrderTreated>> getAllOrders() {
+        List<OrderTreated> orders = orderService.getOrders();
+        return ResponseEntity.ok(orders);
     }
 }

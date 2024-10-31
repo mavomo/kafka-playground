@@ -1,24 +1,27 @@
 package com.playground.kafkaplayground;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.playground.kafkaplayground.domain.Order;
+import com.playground.kafkaplayground.domain.OrderItem;
+import com.playground.kafkaplayground.domain.OrderToBeTreated;
 import com.playground.kafkaplayground.domain.Product;
 import com.playground.kafkaplayground.domain.Product.Price;
+import com.playground.kafkaplayground.infra.OrderService;
+import com.playground.kafkaplayground.infra.OrderTreated;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.Currency;
 import java.util.List;
 
-import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.startsWith;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -31,40 +34,49 @@ class OrderControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @MockBean
+    private OrderService orderServiceMock;
+
     @Test
-    public void should_create_order() throws Exception {
-
-        var orderCreateAt = LocalDateTime.now();
-
+    public void should_create_order_to_be_created_and_return_its_ID_in_location() throws Exception {
         var price = new Price(BigDecimal.valueOf(100), Currency.getInstance("USD"));
         var product = new Product(1L, "Product 1", price);
 
-        var request = new Order(123L, orderCreateAt,
-                List.of(new Order.OrderItem(product, 1)));
+        OrderToBeTreated orderRequest = new OrderToBeTreated(
+                List.of(
+                        new OrderItem(product, 1))
+        );
 
-        var requestJson = objectMapper.writeValueAsString(request);
+        Mockito.when(orderServiceMock.createOrder(orderRequest)).thenReturn("ref-kfk-123");
+
+        var requestJson = objectMapper.writeValueAsString(orderRequest);
         mockMvc.perform(MockMvcRequestBuilders.post("/api/orders")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
                 .andExpect(status().isCreated())
-                .andExpect(header().string("Location", containsString("api/orders/123")));
+                .andExpect(header().string("Location", startsWith("api/orders/ref-kfk-123")));
     }
 
     @Test
-    public void should_retrieve_orders() throws Exception {
-
-        var orderCreateAt = LocalDateTime.of(LocalDate.of(2024, 10, 24), LocalTime.of(12, 02));
-
+    public void should_retrieve_treated_orders() throws Exception {
         var price = new Price(BigDecimal.valueOf(100), Currency.getInstance("USD"));
         var product = new Product(1L, "Product 1", price);
 
-        var request = new Order(123L, orderCreateAt,
-                List.of(new Order.OrderItem(product, 1)));
+        var ordersToBeTreated = new OrderToBeTreated(
+                List.of(new OrderItem(product, 1)));
 
-        var requestJson = objectMapper.writeValueAsString(request);
+        var requestJson = objectMapper.writeValueAsString(ordersToBeTreated);
         mockMvc.perform(MockMvcRequestBuilders.post("/api/orders")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestJson));
+
+        OrderTreated orderTreated = new OrderTreated(
+                "ref-kfk-123",
+                ordersToBeTreated.items(),
+                LocalDateTime.of(2024, 10, 31, 12, 0, 0)
+        );
+
+        Mockito.when(orderServiceMock.getOrders()).thenReturn(List.of(orderTreated));
 
         var orders = mockMvc.perform(MockMvcRequestBuilders.get("/api/orders"))
                 .andExpect(status().isOk())
@@ -73,7 +85,7 @@ class OrderControllerTest {
                 .getContentAsString();
 
         Assertions.assertThat(orders).isEqualTo("""
-                [{"id":123,"orderedAt":"2024-10-24T12:02:00","items":[{"product":{"id":1,"name":"Product 1","price":{"amount":100,"currency":"USD"}},"quantity":1}]}]
+                [{"Id":"ref-kfk-123","item":[{"product":{"id":1,"name":"Product 1","price":{"amount":100,"currency":"USD"}},"quantity":1}],"treatedAt":"2024-10-31T12:00:00"}]
                 """.trim());
     }
 
