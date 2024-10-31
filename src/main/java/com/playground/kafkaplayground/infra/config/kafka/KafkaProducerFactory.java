@@ -1,9 +1,6 @@
 package com.playground.kafkaplayground.infra.config.kafka;
 
 import com.fasterxml.jackson.databind.JsonSerializer;
-import com.playground.kafkaplayground.ProductService;
-import com.playground.kafkaplayground.domain.Inventory;
-import com.playground.kafkaplayground.infra.InventoryService;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -19,11 +16,11 @@ import java.util.Map;
 
 @Configuration
 @EnableConfigurationProperties(KafkaProperties.class)
-public class ClusterConfiguration<K, V> {
+public class KafkaProducerFactory<K, V> {
 
     private final KafkaProperties kafkaProperties;
 
-    public ClusterConfiguration(KafkaProperties kafkaProperties) {
+    public KafkaProducerFactory(KafkaProperties kafkaProperties) {
         this.kafkaProperties = kafkaProperties;
     }
 
