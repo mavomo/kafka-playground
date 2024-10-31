@@ -22,7 +22,11 @@ import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-class OrderControllerTest extends TestConfiguration {
+@TestConfigurationIT
+class OrderControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
 
     @Autowired
     private ObjectMapper objectMapper;
