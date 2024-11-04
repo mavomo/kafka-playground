@@ -1,12 +1,11 @@
-package com.playground.kafkaplayground;
+package com.playground.kafkaplayground.infra;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.playground.kafkaplayground.TestConfigurationIT;
 import com.playground.kafkaplayground.domain.OrderItem;
 import com.playground.kafkaplayground.domain.OrderToBeTreated;
 import com.playground.kafkaplayground.domain.Product;
 import com.playground.kafkaplayground.domain.Product.Price;
-import com.playground.kafkaplayground.infra.OrderService;
-import com.playground.kafkaplayground.infra.OrderTreated;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -85,7 +84,7 @@ class OrderControllerTest {
                 .getContentAsString();
 
         Assertions.assertThat(orders).isEqualTo("""
-                [{"Id":"ref-kfk-123","item":[{"product":{"id":1,"name":"Product 1","price":{"amount":100,"currency":"USD"}},"quantity":1}],"treatedAt":"2024-10-31T12:00:00"}]
+                [{"id":"ref-kfk-123","items":[{"product":{"id":1,"name":"Product 1","price":{"amount":100,"currency":"USD"}},"quantity":1}],"treatedAt":"2024-10-31T12:00:00"}]
                 """.trim());
     }
 

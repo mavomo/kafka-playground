@@ -1,4 +1,4 @@
-package com.playground.kafkaplayground;
+package com.playground.kafkaplayground.infra;
 
 import com.playground.kafkaplayground.domain.Product;
 import org.springframework.stereotype.Service;
