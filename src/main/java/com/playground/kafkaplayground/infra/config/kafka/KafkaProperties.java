@@ -1,16 +1,21 @@
 package com.playground.kafkaplayground.infra.config.kafka;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
 @ConfigurationProperties(prefix = "kafka")
 public class KafkaProperties {
-    private String applicationName;
     private String bootstrapServers;
+    @Value("${kafka.sasl.mechanism}")
     private String saslMechanism;
+    @Value("${kafka.sasl.jaas.username}")
     private String jaasUsername;
+    @Value("${kafka.sasl.jaas.password}")
     private String jaasPassword;
+    @Value("${kafka.security.protocol}")
     private String securityProtocol;
+    @Value("${kafka.session.timeout.ms}")
     private int sessionTimeoutMs;
 
     @NestedConfigurationProperty
@@ -18,11 +23,7 @@ public class KafkaProperties {
 
     @NestedConfigurationProperty
     private Consumer consumer = new Consumer();
-
-    public String getApplicationName() {
-        return applicationName;
-    }
-
+    
     public String getBootstrapServers() {
         return bootstrapServers;
     }
@@ -53,10 +54,6 @@ public class KafkaProperties {
 
     public Consumer getConsumer() {
         return consumer;
-    }
-
-    public void setApplicationName(String applicationName) {
-        this.applicationName = applicationName;
     }
 
     public void setBootstrapServers(String bootstrapServers) {
