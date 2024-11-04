@@ -18,10 +18,24 @@ Ce système vise à rationaliser la supervision des stocks, réduire les rupture
 - Add basic Kafka Producer to producer on specific topic [X]
 - Add basic Kafka Consumer to consume on specific topic []
 - Add technical implementation of kafka in order to reduce the spring kafka abstraction as internal library
-  - Custom Application Properties []
-  - Custom TemplateFactory []
-  - Custom Consumer & Producer configuration class []
-  - ConsumerErrorReplayHandler & KafkaListenerContainerFactory []
+  - Custom Application Properties [X]
+  - Custom TemplateFactory [X]
+  - Custom Producer configuration class [X]
+  - Custom Consumer configuration class []
+  - ConsumerErrorReplayHandler []
+  - KafkaListenerContainerFactory []
+  - Add Schema Registry
+    - Check ConfluentCloud schema registry access & credentials []
+    - Add configuration properties []
+    - Add configuration in ProducerFactory []
+    - Add Avro Maven plugin []
+    - Write Avro Pojo []
+    - Refactor our KafkaTemplate to use Avro Pojo []
+    > why use schema registry?: Technical skill up
+  - Add KafkaStream in order to real time update product inventory
+    - Add basic KStream code []
+    - Add ProductStore []
+    - Add OrderConsumer []
 
 ### Cloud
 - Setup Kafka Cluster on ConfluentCloud with TLS [X]
