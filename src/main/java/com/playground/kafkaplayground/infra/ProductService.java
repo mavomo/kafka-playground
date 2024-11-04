@@ -226,4 +226,8 @@ public class ProductService {
             }
         };
     }
+
+    public Long getProductQuantitiesById(Long productId) {
+        return (long) this.products().stream().distinct().filter(p -> p.id().equals(productId)).toList().size();
+    }
 }
