@@ -30,8 +30,11 @@ public class OrderService {
     }
 
     public String createOrder(OrderToBeTreated order) {
+        if (order.items().isEmpty()) {
+            throw new OrderException("Order is empty of products!");
+        }
         order.items().forEach(item -> {
-            if(productService.getProductById(item.productId()) == null) {
+            if (productService.getProductById(item.productId()) == null) {
                 throw new OrderException("Product not found for productId" + item.productId());
             }
         });
