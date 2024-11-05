@@ -43,7 +43,7 @@ class OrderControllerTest {
 
         OrderToBeTreated orderRequest = new OrderToBeTreated(
                 List.of(
-                        new OrderItem(product, 1))
+                        new OrderItem(product, 1L))
         );
 
         Mockito.when(orderServiceMock.createOrder(orderRequest)).thenReturn("ref-kfk-123");
@@ -62,7 +62,7 @@ class OrderControllerTest {
         var product = new Product(1L, "Product 1", price);
 
         var ordersToBeTreated = new OrderToBeTreated(
-                List.of(new OrderItem(product, 1)));
+                List.of(new OrderItem(product, 1L)));
 
         var requestJson = objectMapper.writeValueAsString(ordersToBeTreated);
         mockMvc.perform(MockMvcRequestBuilders.post("/api/orders")

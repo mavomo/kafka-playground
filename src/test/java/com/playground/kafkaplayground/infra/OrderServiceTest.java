@@ -50,7 +50,7 @@ class OrderServiceTest {
         var product = new Product(1L, "Product 1", price);
 
         sampleOrder = new OrderToBeTreated(
-                List.of(new OrderItem(product, 1)));
+                List.of(new OrderItem(product, 1L)));
 
     }
 

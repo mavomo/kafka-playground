@@ -14,7 +14,7 @@ import java.util.UUID;
 @Service
 public class OrderService {
 
-    private static final String ORDER_TOPIC_NAME = "dev.playground.order.treated";
+    public static final String ORDER_TREATED_TOPIC = "dev.playground.order.treated";
 
     private final Map<String, OrderTreated> orders = new HashMap<>();
     private final KafkaTemplate<String, OrderTreated> kafkaTemplate;
@@ -33,7 +33,7 @@ public class OrderService {
         orders.put(orderId, orderTreated);
 
         var orderRecord = new ProducerRecord<>(
-                ORDER_TOPIC_NAME,
+                ORDER_TREATED_TOPIC,
                 orderId,
                 orderTreated
         );

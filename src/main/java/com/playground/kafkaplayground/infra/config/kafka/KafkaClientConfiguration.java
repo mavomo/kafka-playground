@@ -18,11 +18,11 @@ import java.util.Map;
 
 @Configuration
 @EnableConfigurationProperties(KafkaProperties.class)
-public class KafkaProducerFactory<K, V> {
+public class KafkaClientConfiguration<K, V> {
 
     private final KafkaProperties kafkaProperties;
 
-    public KafkaProducerFactory(KafkaProperties kafkaProperties) {
+    public KafkaClientConfiguration(KafkaProperties kafkaProperties) {
         this.kafkaProperties = kafkaProperties;
     }
 
