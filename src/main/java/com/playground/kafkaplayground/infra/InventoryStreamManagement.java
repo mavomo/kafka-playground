@@ -55,18 +55,20 @@ public class InventoryStreamManagement {
     }
 
     private Inventory createInventory(OrderItem item) {
-        Product product = productService.getProductById(item.product().id());
+        Product product = productService.getProductById(item.productId());
 
         if (product == null) {
-            log.warn("Product not found: {}", item.product().id());
+            log.warn("Product {} not found", item.productId());
             return null;
         }
 
         long newQuantity = DEFAULT_PRODUCT_QUANTITY - item.quantity();
         if (newQuantity < 0) {
-            log.warn("Negative inventory for product: {}", item.product().id());
+            log.warn("Negative inventory for product: {}", item.productId());
         }
 
-        return new Inventory(LocalDateTime.now(), item.product().id(), newQuantity);
+        var newInventory = new Inventory(LocalDateTime.now(), item.productId(), newQuantity);
+        log.info("New inventory: {}", newInventory);
+        return newInventory;
     }
 }

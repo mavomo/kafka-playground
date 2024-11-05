@@ -43,7 +43,7 @@ class OrderControllerTest {
 
         OrderToBeTreated orderRequest = new OrderToBeTreated(
                 List.of(
-                        new OrderItem(product, 1L))
+                        new OrderItem(product.id(), 1L))
         );
 
         Mockito.when(orderServiceMock.createOrder(orderRequest)).thenReturn("ref-kfk-123");
@@ -62,7 +62,7 @@ class OrderControllerTest {
         var product = new Product(1L, "Product 1", price);
 
         var ordersToBeTreated = new OrderToBeTreated(
-                List.of(new OrderItem(product, 1L)));
+                List.of(new OrderItem(product.id(), 1L)));
 
         var requestJson = objectMapper.writeValueAsString(ordersToBeTreated);
         mockMvc.perform(MockMvcRequestBuilders.post("/api/orders")
@@ -84,7 +84,7 @@ class OrderControllerTest {
                 .getContentAsString();
 
         Assertions.assertThat(orders).isEqualTo("""
-                [{"id":"ref-kfk-123","items":[{"product":{"id":1,"name":"Product 1","price":{"amount":100,"currency":"USD"}},"quantity":1}],"treatedAt":"2024-10-31T12:00:00"}]
+                [{"id":"ref-kfk-123","items":[{"product_id":1,"quantity":1}],"treatedAt":"2024-10-31T12:00:00"}]
                 """.trim());
     }
 

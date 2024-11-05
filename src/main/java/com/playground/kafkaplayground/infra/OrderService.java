@@ -16,10 +16,12 @@ public class OrderService {
 
     public static final String ORDER_TREATED_TOPIC = "dev.playground.order.treated";
 
+    private final ProductService productService;
     private final Map<String, OrderTreated> orders = new HashMap<>();
     private final KafkaTemplate<String, OrderTreated> kafkaTemplate;
 
-    public OrderService(KafkaTemplate<String, OrderTreated> kafkaTemplate) {
+    public OrderService(ProductService productService, KafkaTemplate<String, OrderTreated> kafkaTemplate) {
+        this.productService = productService;
         this.kafkaTemplate = kafkaTemplate;
     }
 
@@ -28,6 +30,12 @@ public class OrderService {
     }
 
     public String createOrder(OrderToBeTreated order) {
+        order.items().forEach(item -> {
+            if(productService.getProductById(item.productId()) == null) {
+                throw new OrderException("Product not found for productId" + item.productId());
+            }
+        });
+
         String orderId = "ref-kfk-" + UUID.randomUUID().toString().substring(0, 5);
         OrderTreated orderTreated = new OrderTreated(orderId, order.items(), LocalDateTime.now());
         orders.put(orderId, orderTreated);
