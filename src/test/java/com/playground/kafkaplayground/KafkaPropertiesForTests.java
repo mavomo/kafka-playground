@@ -1,22 +1,29 @@
-package com.playground.kafkaplayground.infra.config.kafka;
+package com.playground.kafkaplayground;
 
+import com.playground.kafkaplayground.infra.config.kafka.KafkaProperties;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
-@ConfigurationProperties(prefix = "kafka")
-public class KafkaProperties {
+@ConfigurationProperties(prefix = "spring.kafka")
+public class KafkaPropertiesForTests {
     private String bootstrapServers;
+    @Value("${spring.kafka.sasl.mechanism}")
     private String saslMechanism;
+    @Value("${spring.kafka.sasl.jaas.username}")
     private String jaasUsername;
+    @Value("${spring.kafka.sasl.jaas.password}")
     private String jaasPassword;
+    @Value("${spring.kafka.security.protocol}")
     private String securityProtocol;
+    @Value("${spring.kafka.session.timeout.ms}")
     private int sessionTimeoutMs;
 
     @NestedConfigurationProperty
-    private Producer producer = new Producer();
+    private KafkaProperties.Producer producer = new KafkaProperties.Producer();
 
     @NestedConfigurationProperty
-    private Consumer consumer = new Consumer();
+    private KafkaProperties.Consumer consumer = new KafkaProperties.Consumer();
 
     public String getBootstrapServers() {
         return bootstrapServers;
@@ -42,11 +49,11 @@ public class KafkaProperties {
         return sessionTimeoutMs;
     }
 
-    public Producer getProducer() {
+    public KafkaProperties.Producer getProducer() {
         return producer;
     }
 
-    public Consumer getConsumer() {
+    public KafkaProperties.Consumer getConsumer() {
         return consumer;
     }
 
@@ -74,11 +81,11 @@ public class KafkaProperties {
         this.sessionTimeoutMs = sessionTimeoutMs;
     }
 
-    public void setProducer(Producer producer) {
+    public void setProducer(KafkaProperties.Producer producer) {
         this.producer = producer;
     }
 
-    public void setConsumer(Consumer consumer) {
+    public void setConsumer(KafkaProperties.Consumer consumer) {
         this.consumer = consumer;
     }
 

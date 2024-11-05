@@ -10,10 +10,10 @@ import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Produced;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.kafka.support.serializer.JsonSerde;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -24,7 +24,7 @@ import static com.playground.kafkaplayground.infra.OrderService.ORDER_TREATED_TO
 import static com.playground.kafkaplayground.infra.ProductService.DEFAULT_PRODUCT_QUANTITY;
 
 @Profile("kafka")
-@Component
+@Service
 public class InventoryStreamManagement {
 
     private final Logger log = LoggerFactory.getLogger(InventoryStreamManagement.class);
@@ -35,7 +35,7 @@ public class InventoryStreamManagement {
         this.productService = productService;
     }
 
-    @Autowired
+    @Bean
     public KStream<String, OrderTreated> buildInventoryStream(StreamsBuilder streamsBuilder) {
 
         Consumed<String, OrderTreated> orderTreatedConsumer = Consumed.with(Serdes.String(), new JsonSerde<>(OrderTreated.class));
