@@ -44,6 +44,7 @@ class OrderServiceTest {
                 new JsonSerializer<>()
         );
 
+        productService = new ProductService();
         orderService = new OrderService(productService, kafkaTemplate);
 
         // Initialize test data

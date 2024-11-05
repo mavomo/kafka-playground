@@ -11,6 +11,7 @@ import org.apache.kafka.streams.kstream.Produced;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.kafka.support.serializer.JsonSerde;
 import org.springframework.stereotype.Component;
 
@@ -22,6 +23,7 @@ import static com.playground.kafkaplayground.infra.InventoryService.INVENTORY_CR
 import static com.playground.kafkaplayground.infra.OrderService.ORDER_TREATED_TOPIC;
 import static com.playground.kafkaplayground.infra.ProductService.DEFAULT_PRODUCT_QUANTITY;
 
+@Profile("kafka")
 @Component
 public class InventoryStreamManagement {
 

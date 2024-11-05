@@ -84,7 +84,7 @@ class OrderControllerTest {
                 .getContentAsString();
 
         Assertions.assertThat(orders).isEqualTo("""
-                [{"id":"ref-kfk-123","items":[{"product_id":1,"quantity":1}],"treatedAt":"2024-10-31T12:00:00"}]
+                [{"id":"ref-kfk-123","items":[{"productId":1,"quantity":1}],"treatedAt":"2024-10-31T12:00:00"}]
                 """.trim());
     }
 
