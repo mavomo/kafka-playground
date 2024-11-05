@@ -1,6 +1,5 @@
 package com.playground.kafkaplayground.infra;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.playground.kafkaplayground.domain.Inventory;
 import com.playground.kafkaplayground.domain.OrderItem;
 import com.playground.kafkaplayground.domain.Product;
@@ -28,7 +27,6 @@ public class InventoryStreamManagement {
 
     private final Logger log = LoggerFactory.getLogger(InventoryStreamManagement.class);
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
     private final ProductService productService;
 
     public InventoryStreamManagement(ProductService productService) {
@@ -38,8 +36,8 @@ public class InventoryStreamManagement {
     @Autowired
     public KStream<String, OrderTreated> buildInventoryStream(StreamsBuilder streamsBuilder) {
 
-        Consumed<String, OrderTreated> orderTreatedConsumer = Consumed.with(Serdes.String(), new JsonSerde<>(OrderTreated.class, objectMapper));
-        Produced<String, Inventory> inventoryProducer = Produced.with(Serdes.String(), new JsonSerde<>(Inventory.class, objectMapper));
+        Consumed<String, OrderTreated> orderTreatedConsumer = Consumed.with(Serdes.String(), new JsonSerde<>(OrderTreated.class));
+        Produced<String, Inventory> inventoryProducer = Produced.with(Serdes.String(), new JsonSerde<>(Inventory.class));
 
         KStream<String, OrderTreated> orderStream = streamsBuilder.stream(ORDER_TREATED_TOPIC, orderTreatedConsumer)
                 .peek((key, order) -> log.info("Processing order: {}", order.id()));
