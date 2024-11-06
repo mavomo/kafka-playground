@@ -11,6 +11,8 @@ import java.util.List;
 @Service
 public class ProductService {
 
+    public static final int DEFAULT_PRODUCT_QUANTITY = 10;
+
     public List<Product> products() {
         return new ArrayList<>() {
             {
@@ -225,5 +227,12 @@ public class ProductService {
                         Currency.getInstance("USD"))));
             }
         };
+    }
+
+    public Product getProductById(Long productId) {
+        return this.products().stream()
+                .filter(p -> p.id().equals(productId))
+                .findFirst()
+                .orElse(null);
     }
 }

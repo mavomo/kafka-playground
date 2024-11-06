@@ -33,9 +33,14 @@ Ce système vise à rationaliser la supervision des stocks, réduire les rupture
     - Refactor our KafkaTemplate to use Avro Pojo []
     > why use schema registry?: Technical skill up
   - Add KafkaStream in order to real time update product inventory
-    - Add basic KStream code []
+    - Add basic KStream code [X]
+    - Add OrderConsumer [X]
+    - Add Inventory Producer [X]
+      - Produce inventory update on "dev.playground.inventory.updated" topic [TODO]
     - Add ProductStore []
-    - Add OrderConsumer []
+      - Implement InventoryService#fillProduct(long quantity) which produce on "dev.playground.inventory.updated" topic []
+    - Add DLQ to handle negative product inventory quantity []
+    - Implement a rest api which list all product inventories [] 
 
 ### Cloud
 - Setup Kafka Cluster on ConfluentCloud with TLS [X]

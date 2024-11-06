@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Service
 public class InventoryService {
 
-    private static final String TOPIC_NAME = "dev.playground.inventory.created";
+    public static final String INVENTORY_CREATED_TOPIC = "dev.playground.inventory.created";
     private static final Long DEFAULT_PRODUCT_QUANTITY = 10L;
 
     private final KafkaTemplate<String, Inventory> kafkaTemplate;
@@ -24,7 +24,7 @@ public class InventoryService {
     public void initialize() {
         productService.products().forEach(product -> {
             var record = new ProducerRecord<>(
-                    TOPIC_NAME,
+                    INVENTORY_CREATED_TOPIC,
                     product.id().toString(),
                     new Inventory(
                             LocalDateTime.now(),

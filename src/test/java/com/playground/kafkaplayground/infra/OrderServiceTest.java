@@ -32,6 +32,7 @@ class OrderServiceTest {
     private KafkaTemplate<String, OrderTreated> kafkaTemplate;
 
     private OrderService orderService;
+    private ProductService productService;
 
     private OrderToBeTreated sampleOrder;
 
@@ -43,14 +44,15 @@ class OrderServiceTest {
                 new JsonSerializer<>()
         );
 
-        orderService = new OrderService(kafkaTemplate);
+        productService = new ProductService();
+        orderService = new OrderService(productService, kafkaTemplate);
 
         // Initialize test data
         var price = new Product.Price(BigDecimal.valueOf(100), Currency.getInstance("USD"));
         var product = new Product(1L, "Product 1", price);
 
         sampleOrder = new OrderToBeTreated(
-                List.of(new OrderItem(product, 1)));
+                List.of(new OrderItem(product.id(), 1L)));
 
     }
 

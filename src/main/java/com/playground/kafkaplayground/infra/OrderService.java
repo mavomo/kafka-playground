@@ -14,12 +14,14 @@ import java.util.UUID;
 @Service
 public class OrderService {
 
-    private static final String ORDER_TOPIC_NAME = "dev.playground.order.treated";
+    public static final String ORDER_TREATED_TOPIC = "dev.playground.order.treated";
 
+    private final ProductService productService;
     private final Map<String, OrderTreated> orders = new HashMap<>();
     private final KafkaTemplate<String, OrderTreated> kafkaTemplate;
 
-    public OrderService(KafkaTemplate<String, OrderTreated> kafkaTemplate) {
+    public OrderService(ProductService productService, KafkaTemplate<String, OrderTreated> kafkaTemplate) {
+        this.productService = productService;
         this.kafkaTemplate = kafkaTemplate;
     }
 
@@ -28,12 +30,21 @@ public class OrderService {
     }
 
     public String createOrder(OrderToBeTreated order) {
+        if (order.items().isEmpty()) {
+            throw new OrderException("Order is empty of products!");
+        }
+        order.items().forEach(item -> {
+            if (productService.getProductById(item.productId()) == null) {
+                throw new OrderException("Product not found for productId" + item.productId());
+            }
+        });
+
         String orderId = "ref-kfk-" + UUID.randomUUID().toString().substring(0, 5);
         OrderTreated orderTreated = new OrderTreated(orderId, order.items(), LocalDateTime.now());
         orders.put(orderId, orderTreated);
 
         var orderRecord = new ProducerRecord<>(
-                ORDER_TOPIC_NAME,
+                ORDER_TREATED_TOPIC,
                 orderId,
                 orderTreated
         );
