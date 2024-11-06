@@ -1,6 +1,7 @@
 package com.playground.kafkaplayground.infra;
 
 import com.playground.kafkaplayground.domain.OrderToBeTreated;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +17,7 @@ public class OrderController {
     public OrderController(OrderService orderService) {
         this.orderService = orderService;
     }
-    
+
     @PostMapping
     public ResponseEntity<String> createOrder(@RequestBody OrderToBeTreated order) {
         String orderId = orderService.createOrder(order);
