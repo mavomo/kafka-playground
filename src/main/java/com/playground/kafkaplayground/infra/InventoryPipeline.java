@@ -3,7 +3,7 @@ package com.playground.kafkaplayground.infra;
 import com.playground.kafkaplayground.domain.Inventory;
 import com.playground.kafkaplayground.domain.OrderItem;
 import com.playground.kafkaplayground.domain.Product;
-import com.playground.kafkaplayground.infra.config.kafka.KafkaProperties;
+import com.playground.kafkaplayground.infra.config.kafka.KafkaStreamConfiguration;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.common.utils.Bytes;
 import org.apache.kafka.streams.*;
@@ -14,7 +14,6 @@ import org.apache.kafka.streams.state.QueryableStoreTypes;
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.kafka.support.serializer.JsonSerde;
@@ -22,7 +21,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
-import java.util.Properties;
 import java.util.stream.Collectors;
 
 import static com.playground.kafkaplayground.infra.InventoryService.INVENTORY_CREATED_TOPIC;
@@ -35,14 +33,13 @@ import static org.apache.kafka.streams.kstream.Materialized.as;
 public class InventoryPipeline {
 
     private final Logger log = LoggerFactory.getLogger(InventoryPipeline.class);
-
     private final ProductService productService;
 
-    @Autowired
-    private KafkaStreams kafkaStreams;
+    private final KafkaStreamConfiguration kafkaStreamConfig;
 
-    public InventoryPipeline(ProductService productService) {
+    public InventoryPipeline(ProductService productService, KafkaStreamConfiguration kafkaStreamConfig) {
         this.productService = productService;
+        this.kafkaStreamConfig = kafkaStreamConfig;
     }
 
     @Bean
@@ -52,19 +49,22 @@ public class InventoryPipeline {
         Produced<String, Inventory> inventoryProducer = Produced.with(Serdes.String(), new JsonSerde<>(Inventory.class));
 
         // Create KTable from existing inventory topic
-        KTable<String, Inventory> inventoryTable = streamsBuilder.table(
+        streamsBuilder.table(
                 INVENTORY_CREATED_TOPIC,
                 Materialized.<String, Inventory, KeyValueStore<Bytes, byte[]>>as("inventory-store")
                         .withKeySerde(Serdes.String())
                         .withValueSerde(new JsonSerde<>(Inventory.class))
         );
 
+        //Declare kafkaStreams instance
+        KafkaStreams kafkaStreams = new KafkaStreams(streamsBuilder.build(), kafkaStreamConfig.kafkaStreamsConfiguration().asProperties());
+
         KStream<String, OrderTreated> orderStream = streamsBuilder.stream(ORDER_TREATED_TOPIC, orderTreatedConsumer)
                 .peek((key, order) -> log.info("Processing order: {}", order.id()));
 
         orderStream.flatMapValues(order -> order.items()
                         .stream()
-                        .map(item -> createInventory(item))
+                        .map(item -> createInventory(item, kafkaStreams))
                         .filter(Objects::nonNull)
                         .collect(Collectors.toList())
                 )
@@ -74,9 +74,8 @@ public class InventoryPipeline {
         return orderStream;
     }
 
-    private Inventory createInventory(OrderItem item) {
+    private Inventory createInventory(OrderItem item, KafkaStreams kafkaStreams) {
         Product product = productService.getProductById(item.productId());
-
         if (product == null) {
             log.warn("Product {} not found", item.productId());
             return null;
@@ -85,9 +84,8 @@ public class InventoryPipeline {
         String productKey = item.productId().toString();
 
         // Get the current inventory from materialized view
-        Inventory currentInventory = getCurrentInventory(productKey);
-        long currentQuantity = currentInventory != null ? currentInventory.quantity() : DEFAULT_PRODUCT_QUANTITY;
-
+        Inventory currentInventory = getCurrentInventory(productKey, kafkaStreams);
+        long currentQuantity = currentInventory != null ? currentInventory.productQuantity() : DEFAULT_PRODUCT_QUANTITY;
         // Calculate new quantity
         long newQuantity = currentQuantity - item.quantity();
         if (newQuantity < 0) {
@@ -99,20 +97,14 @@ public class InventoryPipeline {
         return newInventory;
     }
 
-    private Inventory getCurrentInventory(String productKey) {
-        try {
-            ReadOnlyKeyValueStore<String, Inventory> store =
-                    kafkaStreams.store(
-                            StoreQueryParameters.fromNameAndType(
-                                    "inventory-store",
-                                    QueryableStoreTypes.keyValueStore()
-                            )
-                    );
-            return store.get(productKey);
-        } catch (InvalidStateStoreException e) {
-            log.warn("Store not yet ready for querying", e);
-            return null;
-        }
+    public Inventory getCurrentInventory(String productId, KafkaStreams kafkaStreams) {
+        ReadOnlyKeyValueStore<String, Inventory> store =
+                kafkaStreams.store(StoreQueryParameters.fromNameAndType(
+                        "inventory-store",
+                        QueryableStoreTypes.keyValueStore()
+                ));
+        return store.get(productId);
+
     }
 
 }
