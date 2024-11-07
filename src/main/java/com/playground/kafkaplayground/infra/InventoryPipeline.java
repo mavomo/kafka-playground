@@ -59,6 +59,7 @@ public class InventoryPipeline {
         KStream<String, OrderTreated> orderStream = streamsBuilder.stream(ORDER_TREATED_TOPIC, orderTreatedConsumer)
                 .peek((key, order) -> log.info("Processing order: {}", order.id()));
 
+        // TODO : how to at initialize kstream, load all records from the beginning, current configuration is related to last offset (consumer group)
         KStream<String, Inventory> inventoryStream = streamsBuilder.stream(INVENTORY_CREATED_TOPIC, inventoryConsumer)
                 .peek((key, inventory) -> log.info("Processing current inventory: {}-{}", inventory.productId(), inventory.productQuantity()));
 
@@ -104,7 +105,7 @@ public class InventoryPipeline {
                         String productKey = item.productId().toString();
 
                         // Get current inventory
-                        Inventory currentInventory = store.get(productKey);
+                        Inventory currentInventory = store.get(productKey); // TODO why is null? issue about Long/String? we'll see!!
                         long currentQuantity = currentInventory != null ?
                                 currentInventory.productQuantity() :
                                 DEFAULT_PRODUCT_QUANTITY;
