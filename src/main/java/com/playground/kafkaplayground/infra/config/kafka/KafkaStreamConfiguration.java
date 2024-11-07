@@ -3,10 +3,7 @@ package com.playground.kafkaplayground.infra.config.kafka;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.serialization.Serdes;
-import org.apache.kafka.streams.KafkaStreams;
-import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
-import org.apache.kafka.streams.Topology;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -49,17 +46,23 @@ public class KafkaStreamConfiguration {
                 kafkaProperties.getJaasPassword()
         ));
 
-        // Stream configuration
-        properties.put(StreamsConfig.APPLICATION_ID_CONFIG, "inventory-management");
+        // Serde
         properties.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass().getName());
         properties.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, JsonSerde.class.getName());
+        properties.put(
+                StreamsConfig.DEFAULT_DESERIALIZATION_EXCEPTION_HANDLER_CLASS_CONFIG,
+                ConsumerExceptionHandler.class.getName()
+        );
+
+        // Stream configuration
+        properties.put(StreamsConfig.APPLICATION_ID_CONFIG, "inventory-management");
         properties.put(StreamsConfig.STATE_DIR_CONFIG, "/tmp/kafka-streams");
         properties.put(StreamsConfig.PROCESSING_GUARANTEE_CONFIG, StreamsConfig.EXACTLY_ONCE_V2);
         properties.put(StreamsConfig.REPLICATION_FACTOR_CONFIG, 3);
         properties.put(ProducerConfig.ACKS_CONFIG, "all");
         properties.put(StreamsConfig.producerPrefix(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG), true);
+
         return new KafkaStreamsConfiguration(properties);
     }
-
 
 }
