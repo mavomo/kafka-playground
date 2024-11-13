@@ -6,6 +6,7 @@ import com.playground.kafkaplayground.domain.Product;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
+import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Produced;
@@ -47,7 +48,12 @@ public class InventoryPipeline {
 
         Consumed<String, OrderTreated> orderTreatedConsumer = Consumed.with(Serdes.String(), new JsonSerde<>(OrderTreated.class));
         Produced<String, Inventory> inventoryProducer = Produced.with(Serdes.String(), new JsonSerde<>(Inventory.class));
-        Consumed<String, Inventory> inventoryConsumer = Consumed.with(Serdes.String(), new JsonSerde<>(Inventory.class));
+        Consumed<String, Inventory> inventoryConsumer = Consumed.with(
+                Serdes.String(),
+                new JsonSerde<>(Inventory.class),
+                null,
+                Topology.AutoOffsetReset.EARLIEST
+        );
 
         StoreBuilder<KeyValueStore<String, Inventory>> inventoryStore = Stores.keyValueStoreBuilder(
                 Stores.persistentKeyValueStore(INVENTORY_STORE),
@@ -60,7 +66,7 @@ public class InventoryPipeline {
                 .peek((key, order) -> log.info("Processing order: {}", order.id()));
 
         // TODO : how to at initialize kstream, load all records from the beginning, current configuration is related to last offset (consumer group)
-        KStream<String, Inventory> inventoryStream = streamsBuilder.stream(INVENTORY_CREATED_TOPIC, inventoryConsumer)
+        KStream<String, Inventory> inventoryStream = streamsBuilder.stream(INVENTORY_CREATED_TOPIC, inventoryConsumer.withOffsetResetPolicy(Topology.AutoOffsetReset.EARLIEST))
                 .peek((key, inventory) -> log.info("Processing current inventory: {}-{}", inventory.productId(), inventory.productQuantity()));
 
         inventoryStream.process(() -> new Processor<String, Inventory, Void, Void>() {
@@ -134,6 +140,8 @@ public class InventoryPipeline {
                 }, INVENTORY_STORE)
                 .selectKey((key, update) -> update.productId().toString())
                 .to(INVENTORY_CREATED_TOPIC, inventoryProducer);
+
+        log.info("KStream topology: ${}", streamsBuilder.build().describe().toString());
 
         return orderStream;
     }
