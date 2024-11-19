@@ -4,16 +4,15 @@ import com.playground.kafkaplayground.domain.Inventory;
 import com.playground.kafkaplayground.domain.OrderItem;
 import com.playground.kafkaplayground.domain.Product;
 import org.apache.kafka.common.serialization.Serdes;
+import org.apache.kafka.common.utils.Bytes;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.Topology;
-import org.apache.kafka.streams.kstream.Consumed;
-import org.apache.kafka.streams.kstream.KStream;
-import org.apache.kafka.streams.kstream.Produced;
-import org.apache.kafka.streams.kstream.Transformer;
+import org.apache.kafka.streams.kstream.*;
 import org.apache.kafka.streams.processor.ProcessorContext;
 import org.apache.kafka.streams.processor.api.Processor;
 import org.apache.kafka.streams.state.KeyValueStore;
+import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
 import org.apache.kafka.streams.state.StoreBuilder;
 import org.apache.kafka.streams.state.Stores;
 import org.slf4j.Logger;
@@ -65,39 +64,23 @@ public class InventoryPipeline {
         KStream<String, OrderTreated> orderStream = streamsBuilder.stream(ORDER_TREATED_TOPIC, orderTreatedConsumer)
                 .peek((key, order) -> log.info("Processing order: {}", order.id()));
 
-        // TODO : how to at initialize kstream, load all records from the beginning, current configuration is related to last offset (consumer group)
-        KStream<String, Inventory> inventoryStream = streamsBuilder.stream(INVENTORY_CREATED_TOPIC, inventoryConsumer.withOffsetResetPolicy(Topology.AutoOffsetReset.EARLIEST))
-                .peek((key, inventory) -> log.info("Processing current inventory: {}-{}", inventory.productId(), inventory.productQuantity()));
+        KTable<String, Inventory> inventoryTable = streamsBuilder
+                .table(INVENTORY_CREATED_TOPIC,  Materialized.<String, Inventory, KeyValueStore<Bytes, byte[]>>as("inventory-ktable")
+                        .withKeySerde(Serdes.String())
+                        .withValueSerde(new JsonSerde<>(Inventory.class)));
 
-        inventoryStream.process(() -> new Processor<String, Inventory, Void, Void>() {
-            private KeyValueStore<String, Inventory> store;
-
-            @Override
-            public void init(org.apache.kafka.streams.processor.api.ProcessorContext<Void, Void> context) {
-                Processor.super.init(context);
-                this.store = context.getStateStore(INVENTORY_STORE);
-                log.info("inventoryStream processor initialized");
-            }
-
-            @Override
-            public void process(org.apache.kafka.streams.processor.api.Record<String, Inventory> record) {
-                store.put(record.key(), record.value());
-                log.info("Loaded inventory for product {}: {}", record.key(), record.value());
-            }
-
-            @Override
-            public void close() {
-                log.info("inventoryStream processor closed");
-            }
-        }, INVENTORY_STORE);
 
         orderStream.flatMapValues(OrderTreated::items)
                 .transform(() -> new Transformer<String, OrderItem, KeyValue<String, Inventory>>() {
-                    private KeyValueStore<String, Inventory> store;
+
+                    private ProcessorContext context;
+                    String storeName = inventoryTable.queryableStoreName();
+
+                    ReadOnlyKeyValueStore<String, Inventory> store = context.getStateStore(storeName);
 
                     @Override
                     public void init(ProcessorContext context) {
-                        this.store = context.getStateStore(INVENTORY_STORE);
+                        this.context = context;
                     }
 
                     @Override
@@ -128,7 +111,6 @@ public class InventoryPipeline {
                                 item.productId(),
                                 newQuantity
                         );
-                        store.put(productKey, newInventory);
 
                         log.info("New inventory: {}", newInventory);
                         return KeyValue.pair(productKey, newInventory);
