@@ -30,14 +30,10 @@ public class KafkaStreamConfiguration {
         this.kafkaProperties = kafkaProperties;
     }
 
-    @Bean(name = KafkaStreamsDefaultConfiguration.DEFAULT_STREAMS_CONFIG_BEAN_NAME)
-    public KafkaStreamsConfiguration kafkaStreamsConfiguration() {
+    @Bean
+    public KafkaStreamsConfiguration defaultKafkaStreamsConfig() {
         Map<String, Object> properties = new HashMap<>();
-
-        // Connection
         properties.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getBootstrapServers());
-
-        // SASL Authentication
         properties.put(StreamsConfig.SECURITY_PROTOCOL_CONFIG, kafkaProperties.getSecurityProtocol());
         properties.put(SaslConfigs.SASL_MECHANISM, kafkaProperties.getSaslMechanism());
         properties.put(SaslConfigs.SASL_JAAS_CONFIG, String.format(
