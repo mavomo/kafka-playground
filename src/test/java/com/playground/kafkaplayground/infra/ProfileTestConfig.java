@@ -1,6 +1,5 @@
 package com.playground.kafkaplayground.infra;
 
-import com.playground.kafkaplayground.KafkaPropertiesForTests;
 import com.playground.kafkaplayground.domain.Inventory;
 import com.playground.kafkaplayground.infra.config.kafka.KafkaProperties;
 import com.playground.kafkaplayground.infra.inventory.InventoryService;
@@ -30,17 +29,15 @@ import java.util.Map;
 
 
 @TestConfiguration
-@EnableConfigurationProperties(KafkaPropertiesForTests.class)
-@Profile("test")
+@EnableConfigurationProperties(KafkaProperties.class)
+@Profile("kafka-test")
 public class ProfileTestConfig {
 
     private final KafkaProperties kafkaProperties;
 
-
     public ProfileTestConfig(KafkaProperties kafkaProperties) {
         this.kafkaProperties = kafkaProperties;
     }
-
 
     @Bean
     public InventoryService inventoryService(KafkaTemplate<String, Inventory> kafkaTemplate, ProductService productService) {

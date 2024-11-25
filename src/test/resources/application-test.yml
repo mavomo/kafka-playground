@@ -2,7 +2,7 @@ spring:
   application:
     name: kafka-playground-test
   kafka:
-    bootstrap-servers: bootstrap
+    bootstrap-servers: localhost:9092
     sasl:
       mechanism: PLAIN
       jaas:
