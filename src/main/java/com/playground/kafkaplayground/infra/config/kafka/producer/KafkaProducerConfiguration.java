@@ -1,5 +1,6 @@
-package com.playground.kafkaplayground.infra.config.kafka;
+package com.playground.kafkaplayground.infra.config.kafka.producer;
 
+import com.playground.kafkaplayground.infra.config.kafka.KafkaProperties;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.config.SaslConfigs;
@@ -7,7 +8,6 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
@@ -17,20 +17,24 @@ import org.springframework.kafka.support.serializer.JsonSerializer;
 import java.util.HashMap;
 import java.util.Map;
 
-@Profile("kafka")
 @Configuration
 @EnableConfigurationProperties(KafkaProperties.class)
-public class KafkaClientConfiguration<K, V> {
-
+public class KafkaProducerConfiguration<K, V> {
     private final KafkaProperties kafkaProperties;
 
-    public KafkaClientConfiguration(KafkaProperties kafkaProperties) {
+    public KafkaProducerConfiguration(KafkaProperties kafkaProperties) {
         this.kafkaProperties = kafkaProperties;
     }
 
     @Bean
     public ProducerFactory<K, V> producerFactory() {
+        return new DefaultKafkaProducerFactory<>(producerConfigs());
+    }
+
+    @Bean
+    public Map<String, Object> producerConfigs() {
         Map<String, Object> configProps = new HashMap<>();
+        System.out.println(" inside the producerConfigs() method");
 
         // Connection
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getBootstrapServers());
@@ -54,8 +58,7 @@ public class KafkaClientConfiguration<K, V> {
         configProps.put(ProducerConfig.BATCH_SIZE_CONFIG, kafkaProperties.getProducer().getBatchSize());
         configProps.put(ProducerConfig.LINGER_MS_CONFIG, kafkaProperties.getProducer().getLingerMs());
         configProps.put(ProducerConfig.BUFFER_MEMORY_CONFIG, kafkaProperties.getProducer().getBufferMemory());
-
-        return new DefaultKafkaProducerFactory<>(configProps);
+        return configProps;
     }
 
     @Bean

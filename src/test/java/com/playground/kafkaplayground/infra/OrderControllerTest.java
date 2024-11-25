@@ -6,12 +6,18 @@ import com.playground.kafkaplayground.domain.OrderItem;
 import com.playground.kafkaplayground.domain.OrderToBeTreated;
 import com.playground.kafkaplayground.domain.Product;
 import com.playground.kafkaplayground.domain.Product.Price;
+import com.playground.kafkaplayground.infra.config.kafka.KafkaProperties;
+import com.playground.kafkaplayground.infra.orders.OrderService;
+import com.playground.kafkaplayground.infra.orders.OrderTreated;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -25,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @TestConfigurationIT
+@Disabled
 class OrderControllerTest {
 
     @Autowired

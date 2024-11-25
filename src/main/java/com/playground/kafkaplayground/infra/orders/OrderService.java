@@ -1,6 +1,7 @@
-package com.playground.kafkaplayground.infra;
+package com.playground.kafkaplayground.infra.orders;
 
 import com.playground.kafkaplayground.domain.OrderToBeTreated;
+import com.playground.kafkaplayground.infra.products.ProductService;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;

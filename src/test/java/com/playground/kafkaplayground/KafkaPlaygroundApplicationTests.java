@@ -1,13 +1,12 @@
 package com.playground.kafkaplayground;
 
+import com.playground.kafkaplayground.infra.KafkaStreamConfigurationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.context.ActiveProfiles;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@EmbeddedKafka(partitions = 1, topics = "random-topic-in")
+@KafkaStreamConfigurationTest
 public class KafkaPlaygroundApplicationTests {
 
     @Test

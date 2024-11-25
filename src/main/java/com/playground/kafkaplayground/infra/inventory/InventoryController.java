@@ -1,4 +1,4 @@
-package com.playground.kafkaplayground.infra;
+package com.playground.kafkaplayground.infra.inventory;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

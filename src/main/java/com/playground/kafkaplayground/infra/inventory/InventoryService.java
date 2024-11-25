@@ -1,6 +1,7 @@
-package com.playground.kafkaplayground.infra;
+package com.playground.kafkaplayground.infra.inventory;
 
 import com.playground.kafkaplayground.domain.Inventory;
+import com.playground.kafkaplayground.infra.products.ProductService;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;

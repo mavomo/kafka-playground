@@ -1,5 +1,7 @@
-package com.playground.kafkaplayground.infra.config.kafka;
+package com.playground.kafkaplayground.infra.config.kafka.streams;
 
+import com.playground.kafkaplayground.infra.config.kafka.ConsumerExceptionHandler;
+import com.playground.kafkaplayground.infra.config.kafka.KafkaProperties;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.serialization.Serdes;
@@ -7,7 +9,6 @@ import org.apache.kafka.streams.StreamsConfig;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.annotation.EnableKafkaStreams;
 import org.springframework.kafka.annotation.KafkaStreamsDefaultConfiguration;
@@ -17,7 +18,6 @@ import org.springframework.kafka.support.serializer.JsonSerde;
 import java.util.HashMap;
 import java.util.Map;
 
-@Profile("kafka")
 @Configuration
 @EnableKafka
 @EnableKafkaStreams
@@ -30,14 +30,10 @@ public class KafkaStreamConfiguration {
         this.kafkaProperties = kafkaProperties;
     }
 
-    @Bean(name = KafkaStreamsDefaultConfiguration.DEFAULT_STREAMS_CONFIG_BEAN_NAME)
-    public KafkaStreamsConfiguration kafkaStreamsConfiguration() {
+    @Bean
+    public KafkaStreamsConfiguration defaultKafkaStreamsConfig() {
         Map<String, Object> properties = new HashMap<>();
-
-        // Connection
         properties.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getBootstrapServers());
-
-        // SASL Authentication
         properties.put(StreamsConfig.SECURITY_PROTOCOL_CONFIG, kafkaProperties.getSecurityProtocol());
         properties.put(SaslConfigs.SASL_MECHANISM, kafkaProperties.getSaslMechanism());
         properties.put(SaslConfigs.SASL_JAAS_CONFIG, String.format(
@@ -46,15 +42,23 @@ public class KafkaStreamConfiguration {
                 kafkaProperties.getJaasPassword()
         ));
 
-        // Stream configuration
-        properties.put(StreamsConfig.APPLICATION_ID_CONFIG, "inventory-management");
+        // Serde
         properties.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass().getName());
         properties.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, JsonSerde.class.getName());
+        properties.put(
+                StreamsConfig.DEFAULT_DESERIALIZATION_EXCEPTION_HANDLER_CLASS_CONFIG,
+                ConsumerExceptionHandler.class.getName()
+        );
+
+        // Stream configuration
+        properties.put(StreamsConfig.APPLICATION_ID_CONFIG, "inventory-management");
         properties.put(StreamsConfig.STATE_DIR_CONFIG, "/tmp/kafka-streams");
         properties.put(StreamsConfig.PROCESSING_GUARANTEE_CONFIG, StreamsConfig.EXACTLY_ONCE_V2);
         properties.put(StreamsConfig.REPLICATION_FACTOR_CONFIG, 3);
         properties.put(ProducerConfig.ACKS_CONFIG, "all");
         properties.put(StreamsConfig.producerPrefix(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG), true);
+
         return new KafkaStreamsConfiguration(properties);
     }
+
 }
