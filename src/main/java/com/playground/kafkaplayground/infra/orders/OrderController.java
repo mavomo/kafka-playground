@@ -1,7 +1,6 @@
-package com.playground.kafkaplayground.infra;
+package com.playground.kafkaplayground.infra.orders;
 
 import com.playground.kafkaplayground.domain.OrderToBeTreated;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

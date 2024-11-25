@@ -1,5 +1,7 @@
-package com.playground.kafkaplayground.infra.config.kafka;
+package com.playground.kafkaplayground.infra.config.kafka.streams;
 
+import com.playground.kafkaplayground.infra.config.kafka.ConsumerExceptionHandler;
+import com.playground.kafkaplayground.infra.config.kafka.KafkaProperties;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.serialization.Serdes;
@@ -7,7 +9,6 @@ import org.apache.kafka.streams.StreamsConfig;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.annotation.EnableKafkaStreams;
 import org.springframework.kafka.annotation.KafkaStreamsDefaultConfiguration;
@@ -17,7 +18,6 @@ import org.springframework.kafka.support.serializer.JsonSerde;
 import java.util.HashMap;
 import java.util.Map;
 
-@Profile("kafka")
 @Configuration
 @EnableKafka
 @EnableKafkaStreams

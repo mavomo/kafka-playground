@@ -2,11 +2,9 @@ package com.playground.kafkaplayground;
 
 import com.playground.kafkaplayground.infra.config.kafka.KafkaProperties;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
-@ConfigurationProperties(prefix = "spring.kafka")
-public class KafkaPropertiesForTests {
+public class KafkaPropertiesForTests {//TODO: I doubt it works without an @Configuration config
     private String bootstrapServers;
     @Value("${spring.kafka.sasl.mechanism}")
     private String saslMechanism;

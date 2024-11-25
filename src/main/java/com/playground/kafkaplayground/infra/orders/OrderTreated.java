@@ -1,4 +1,4 @@
-package com.playground.kafkaplayground.infra;
+package com.playground.kafkaplayground.infra.orders;
 
 import com.playground.kafkaplayground.domain.OrderItem;
 
