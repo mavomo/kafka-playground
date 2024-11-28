@@ -1,5 +1,6 @@
 package com.playground.kafkaplayground.infra.config.kafka;
 
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.serialization.Serdes;
@@ -46,15 +47,26 @@ public class KafkaStreamConfiguration {
                 kafkaProperties.getJaasPassword()
         ));
 
-        // Stream configuration
-        properties.put(StreamsConfig.APPLICATION_ID_CONFIG, "inventory-management");
+        // Serde
         properties.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass().getName());
         properties.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, JsonSerde.class.getName());
+        properties.put(
+                StreamsConfig.DEFAULT_DESERIALIZATION_EXCEPTION_HANDLER_CLASS_CONFIG,
+                ConsumerExceptionHandler.class.getName()
+        );
+
+        // Stream configuration
+        properties.put(StreamsConfig.APPLICATION_ID_CONFIG, "inventory-management");
         properties.put(StreamsConfig.STATE_DIR_CONFIG, "/tmp/kafka-streams");
         properties.put(StreamsConfig.PROCESSING_GUARANTEE_CONFIG, StreamsConfig.EXACTLY_ONCE_V2);
         properties.put(StreamsConfig.REPLICATION_FACTOR_CONFIG, 3);
         properties.put(ProducerConfig.ACKS_CONFIG, "all");
         properties.put(StreamsConfig.producerPrefix(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG), true);
+
+        properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+        properties.put(StreamsConfig.consumerPrefix(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG), "earliest");
+
         return new KafkaStreamsConfiguration(properties);
     }
+
 }

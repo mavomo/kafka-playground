@@ -60,3 +60,44 @@ Ce système vise à rationaliser la supervision des stocks, réduire les rupture
 
 ### How to run
 > docker run -d --name kafka-playground-app -p 8080:8080 kafka-playground-app:latest
+
+### KStream Topology
+
+https://zz85.github.io/kafka-streams-viz/
+
+### Kafka ACL's
+
+> https://docs.confluent.io/cloud/current/cp-component/streams-cloud-config.html
+
+# 1. Consumer Group ACLs
+confluent kafka acl create --allow \
+--service-account $service_account \
+--operations READ \
+--consumer-group "$topic_name" \
+--prefix
+
+# 2. Input Topic ACLs (for order_created topic)
+confluent kafka acl create --allow \
+--service-account $service_account \
+--operations READ \
+--topic "$topic_name"
+
+# 3. Output Topic ACLs (for inventory_update topic)
+confluent kafka acl create --allow \
+--service-account $service_account \
+--operations WRITE \
+--topic "$topic_name"
+
+# 4. Internal Topics ACLs (for Kafka Streams internal topics)
+confluent kafka acl create --allow \
+--service-account $service_account \
+--operations read,describe \
+--topic "$topic_name" \
+--prefix
+
+# 5. Transaction ACLs (for exactly-once processing)
+confluent kafka acl create --allow \
+--service-account $service_account \
+--operations WRITE \
+--transactional-id "$topic_name" \
+--prefix
