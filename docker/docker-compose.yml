@@ -1,0 +1,74 @@
+version: '3.7'
+
+services:
+
+  kafka-broker:
+    image: confluentinc/cp-kafka:7.7.0
+    container_name: kafka-broker
+    hostname: kafka-broker
+    networks:
+      - kafka_playground
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      # KRaft mode specific settings
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: "1@kafka-broker:9093"
+      CLUSTER_ID: p8fFEbKGQ22B6M_Da_vCBw
+      # Add controller.listener.names and match with the listener name in listeners
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      # Listeners configuration
+      KAFKA_LISTENERS: LISTENER_IN://kafka-broker:29092,LISTENER_OUT://kafka-broker:9092,CONTROLLER://kafka-broker:9093
+      KAFKA_ADVERTISED_LISTENERS: LISTENER_IN://kafka-broker:29092,LISTENER_OUT://kafka-broker:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_IN:PLAINTEXT,LISTENER_OUT:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_IN
+      # Topic settings
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_DELETE_TOPIC_ENABLE: "true"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      # Transaction settings
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      # Directories
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+    volumes:
+      - kafka-broker-data:/var/lib/kafka
+
+  tools:
+    image: confluentinc/cp-kafka:7.7.0
+    hostname: tools
+    networks:
+      - kafka_playground
+    restart: always
+    container_name: tools
+    command: "bash -c 'echo Waiting for Kafka to be ready... && \
+      cub kafka-ready -b kafka:9092 1 300 && \
+      echo Kafka is ready... &&  sleep infinity'"
+
+  akhq-ui:
+    image: tchiotludo/akhq:0.25.1
+    container_name: akhq-ui
+    hostname: akhq-ui
+    networks:
+      - kafka_playground
+    ports:
+      - "11080:8080"
+    environment:
+      AKHQ_CONFIGURATION: |
+        akhq:
+          connections:
+            docker-kafka-server:
+              properties:
+                bootstrap.servers: "kafka-broker:9092"
+    depends_on:
+      - kafka-broker
+
+volumes:
+  kafka-broker-data:
+    driver: local
+
+networks:
+  kafka_playground:
+    name: local_kafka_playground_network

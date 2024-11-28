@@ -40,13 +40,15 @@ public class KafkaProducerConfiguration<K, V> {
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getBootstrapServers());
 
         // SASL Authentication
-        configProps.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, kafkaProperties.getSecurityProtocol());
-        configProps.put(SaslConfigs.SASL_MECHANISM, kafkaProperties.getSaslMechanism());
-        configProps.put(SaslConfigs.SASL_JAAS_CONFIG, String.format(
-                "org.apache.kafka.common.security.plain.PlainLoginModule required username='%s' password='%s';",
-                kafkaProperties.getJaasUsername(),
-                kafkaProperties.getJaasPassword()
-        ));
+        if (kafkaProperties.isActivateSsl()) {
+            configProps.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, kafkaProperties.getSecurityProtocol());
+            configProps.put(SaslConfigs.SASL_MECHANISM, kafkaProperties.getSaslMechanism());
+            configProps.put(SaslConfigs.SASL_JAAS_CONFIG, String.format(
+                    "org.apache.kafka.common.security.plain.PlainLoginModule required username='%s' password='%s';",
+                    kafkaProperties.getJaasUsername(),
+                    kafkaProperties.getJaasPassword()
+            ));
+        }
 
         // SerDes
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());

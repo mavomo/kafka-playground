@@ -59,37 +59,78 @@ Ce système vise à rationaliser la supervision des stocks, réduire les rupture
 > docker build -t kafka-playground-app . 
 
 ### How to run
-> docker run -d --name kafka-playground-app -p 8080:8080 kafka-playground-app:latest
+
+**SpringBootApp inside Docker**
+```shell
+docker run -d --name kafka-playground-app -p 8080:8080 kafka-playground-app:latest
+```
+
+**Kafka**
+
+1. env setup
+Open your /etc/hosts
+```shell
+sudo nano /etc/hosts
+```
+Then add it `127.0.0.1 kafka-broker`
+
+2. run docker stack
+```shell
+cd docker
+docker-compose up -d
+```
+
+3. check everything's fine 
+
+Via AKHQ
+http://localhost:11080/ui/docker-kafka-server/node
+
+Via Docker logs
+```shell
+docker logs kafka-broker
+INFO Kafka version: 7.7.0-ccs (org.apache.kafka.common.utils.AppInfoParser)
+INFO Kafka commitId: 342a7370342e6bbcecbdf171dbe71cf87ce67c49 (org.apache.kafka.common.utils.AppInfoParser)
+INFO Kafka startTimeMs: 1732825691858 (org.apache.kafka.common.utils.AppInfoParser)
+INFO [KafkaRaftServer nodeId=1] Kafka Server started (kafka.server.KafkaRaftServer)
+```
+
+**SpringBootApp from IntelliJ**
+Add the `dev-local` in active profile in run/debug configuration. 
+
+**SpringBootApp from command line**
+```shell
+./gradlew bootRun --args='--spring.profiles.active=dev-local'
+```
 
 ### Kafka ACL's
 
-# 1. Consumer Group ACLs
+1. Consumer Group ACLs
 confluent kafka acl create --allow \
 --service-account $service_account \
 --operations READ \
 --consumer-group "$topic_name" \
 --prefix
 
-# 2. Input Topic ACLs (for order_created topic)
+2. Input Topic ACLs (for order_created topic)
 confluent kafka acl create --allow \
 --service-account $service_account \
 --operations READ \
 --topic "$topic_name"
 
-# 3. Output Topic ACLs (for inventory_update topic)
+3. Output Topic ACLs (for inventory_update topic)
 confluent kafka acl create --allow \
 --service-account $service_account \
 --operations WRITE \
 --topic "$topic_name"
 
-# 4. Internal Topics ACLs (for Kafka Streams internal topics)
+4. Internal Topics ACLs (for Kafka Streams internal topics)
 confluent kafka acl create --allow \
 --service-account $service_account \
 --operations read,describe \
 --topic "$topic_name" \
 --prefix
 
-# 5. Transaction ACLs (for exactly-once processing)
+5. Transaction ACLs (for exactly-once processing)
 confluent kafka acl create --allow \
 --service-account $service_account \
 --operations WRITE \
