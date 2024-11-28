@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "spring.kafka")
 public class KafkaProperties {
     private String bootstrapServers;
+    private boolean activateSsl;
     private Sasl sasl= new Sasl();
     private Security security = new Security();
     private Session session = new Session();
@@ -228,6 +229,14 @@ public class KafkaProperties {
 
     public String getBootstrapServers() {
         return bootstrapServers;
+    }
+
+    public boolean isActivateSsl() {
+        return activateSsl;
+    }
+
+    public void setActivateSsl(boolean activateSsl) {
+        this.activateSsl = activateSsl;
     }
 
     public Producer getProducer() {

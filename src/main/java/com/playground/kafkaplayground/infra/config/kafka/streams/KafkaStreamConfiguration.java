@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.annotation.EnableKafkaStreams;
-import org.springframework.kafka.annotation.KafkaStreamsDefaultConfiguration;
 import org.springframework.kafka.config.KafkaStreamsConfiguration;
 import org.springframework.kafka.support.serializer.JsonSerde;
 
@@ -34,13 +33,16 @@ public class KafkaStreamConfiguration {
     public KafkaStreamsConfiguration defaultKafkaStreamsConfig() {
         Map<String, Object> properties = new HashMap<>();
         properties.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getBootstrapServers());
-        properties.put(StreamsConfig.SECURITY_PROTOCOL_CONFIG, kafkaProperties.getSecurityProtocol());
-        properties.put(SaslConfigs.SASL_MECHANISM, kafkaProperties.getSaslMechanism());
-        properties.put(SaslConfigs.SASL_JAAS_CONFIG, String.format(
-                "org.apache.kafka.common.security.plain.PlainLoginModule required username='%s' password='%s';",
-                kafkaProperties.getJaasUsername(),
-                kafkaProperties.getJaasPassword()
-        ));
+
+        if (kafkaProperties.isActivateSsl()) {
+            properties.put(StreamsConfig.SECURITY_PROTOCOL_CONFIG, kafkaProperties.getSecurityProtocol());
+            properties.put(SaslConfigs.SASL_MECHANISM, kafkaProperties.getSaslMechanism());
+            properties.put(SaslConfigs.SASL_JAAS_CONFIG, String.format(
+                    "org.apache.kafka.common.security.plain.PlainLoginModule required username='%s' password='%s';",
+                    kafkaProperties.getJaasUsername(),
+                    kafkaProperties.getJaasPassword()
+            ));
+        }
 
         // Serde
         properties.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass().getName());
