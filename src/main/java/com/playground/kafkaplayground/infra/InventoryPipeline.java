@@ -4,13 +4,11 @@ import com.playground.kafkaplayground.domain.Inventory;
 import com.playground.kafkaplayground.domain.OrderItem;
 import com.playground.kafkaplayground.domain.Product;
 import org.apache.kafka.common.serialization.Serdes;
+import org.apache.kafka.common.utils.Bytes;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.Topology;
-import org.apache.kafka.streams.kstream.Consumed;
-import org.apache.kafka.streams.kstream.KStream;
-import org.apache.kafka.streams.kstream.Produced;
-import org.apache.kafka.streams.kstream.Transformer;
+import org.apache.kafka.streams.kstream.*;
 import org.apache.kafka.streams.processor.ProcessorContext;
 import org.apache.kafka.streams.processor.api.Processor;
 import org.apache.kafka.streams.state.KeyValueStore;
@@ -69,6 +67,13 @@ public class InventoryPipeline {
         KStream<String, Inventory> inventoryStream = streamsBuilder.stream(INVENTORY_CREATED_TOPIC, inventoryConsumer.withOffsetResetPolicy(Topology.AutoOffsetReset.EARLIEST))
                 .peek((key, inventory) -> log.info("Processing current inventory: {}-{}", inventory.productId(), inventory.productQuantity()));
 
+        KTable<String, Inventory> inventoryTable = streamsBuilder.table(
+                INVENTORY_CREATED_TOPIC,
+                Materialized.<String, Inventory, KeyValueStore<Bytes, byte[]>>as("inventory-ktable")
+                        .withKeySerde(Serdes.String())
+                        .withValueSerde(new JsonSerde<>(Inventory.class))
+        );
+
         inventoryStream.process(() -> new Processor<String, Inventory, Void, Void>() {
             private KeyValueStore<String, Inventory> store;
 
@@ -112,6 +117,9 @@ public class InventoryPipeline {
 
                         // Get current inventory
                         Inventory currentInventory = store.get(productKey); // TODO why is null? issue about Long/String? we'll see!!
+                        if (currentInventory == null) {
+                            throw new RuntimeException("currentInventory for product id: " + productKey + " not found from the store");
+                        }
                         long currentQuantity = currentInventory != null ?
                                 currentInventory.productQuantity() :
                                 DEFAULT_PRODUCT_QUANTITY;

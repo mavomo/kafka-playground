@@ -1,0 +1,20 @@
+version: '3.7'
+
+services:
+
+  akhq-ui:
+    image: tchiotludo/akhq:0.25.1
+    container_name: akhq-ui
+    hostname: akhq-ui
+    ports:
+      - "11080:8080"
+    environment:
+      AKHQ_CONFIGURATION: |
+        akhq:
+          connections:
+            docker-kafka-server:
+              properties:
+                bootstrap.servers: "pkc-4nmjv.francecentral.azure.confluent.cloud:9092"
+                security.protocol: SASL_SSL
+                sasl.mechanism: PLAIN
+                sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="JWFCSOXTSPKD52IJ" password="ZVNBOFJCRgkvN4WxGG8gG2nLcbffyBmPEJeiNWrAno/H0m5TISlYvgPLqSEEJ26j";
