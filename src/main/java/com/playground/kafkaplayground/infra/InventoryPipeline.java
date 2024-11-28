@@ -53,12 +53,11 @@ public class InventoryPipeline {
                 Topology.AutoOffsetReset.EARLIEST
         );
 
-        StoreBuilder<KeyValueStore<String, Inventory>> inventoryStore = Stores.keyValueStoreBuilder(
+        streamsBuilder.addStateStore(Stores.keyValueStoreBuilder(
                 Stores.persistentKeyValueStore(INVENTORY_STORE),
                 Serdes.String(),
                 new JsonSerde<>(Inventory.class)
-        );
-        streamsBuilder.addStateStore(inventoryStore);
+        ));
 
         KStream<String, OrderTreated> orderStream = streamsBuilder.stream(ORDER_TREATED_TOPIC, orderTreatedConsumer)
                 .peek((key, order) -> log.info("Processing order: {}", order.id()));
@@ -66,13 +65,6 @@ public class InventoryPipeline {
         // TODO : how to at initialize kstream, load all records from the beginning, current configuration is related to last offset (consumer group)
         KStream<String, Inventory> inventoryStream = streamsBuilder.stream(INVENTORY_CREATED_TOPIC, inventoryConsumer.withOffsetResetPolicy(Topology.AutoOffsetReset.EARLIEST))
                 .peek((key, inventory) -> log.info("Processing current inventory: {}-{}", inventory.productId(), inventory.productQuantity()));
-
-        KTable<String, Inventory> inventoryTable = streamsBuilder.table(
-                INVENTORY_CREATED_TOPIC,
-                Materialized.<String, Inventory, KeyValueStore<Bytes, byte[]>>as("inventory-ktable")
-                        .withKeySerde(Serdes.String())
-                        .withValueSerde(new JsonSerde<>(Inventory.class))
-        );
 
         inventoryStream.process(() -> new Processor<String, Inventory, Void, Void>() {
             private KeyValueStore<String, Inventory> store;
@@ -120,9 +112,7 @@ public class InventoryPipeline {
                         if (currentInventory == null) {
                             throw new RuntimeException("currentInventory for product id: " + productKey + " not found from the store");
                         }
-                        long currentQuantity = currentInventory != null ?
-                                currentInventory.productQuantity() :
-                                DEFAULT_PRODUCT_QUANTITY;
+                        long currentQuantity = currentInventory.productQuantity();
 
                         // Calculate new quantity
                         long newQuantity = currentQuantity - item.quantity();

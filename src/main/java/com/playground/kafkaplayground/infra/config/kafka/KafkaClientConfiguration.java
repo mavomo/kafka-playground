@@ -2,8 +2,11 @@ package com.playground.kafkaplayground.infra.config.kafka;
 
 import com.playground.kafkaplayground.domain.Inventory;
 import org.apache.kafka.clients.CommonClientConfigs;
+import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRebalanceListener;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -18,8 +21,10 @@ import org.springframework.kafka.support.LoggingProducerListener;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Profile("kafka")
 @Configuration
@@ -66,6 +71,23 @@ public class KafkaClientConfiguration<K, V> {
     public ConcurrentKafkaListenerContainerFactory<String, Inventory> inventoryKafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, Inventory> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(inventoryConsumerFactory());
+        AtomicBoolean resetOffsets = new AtomicBoolean(true); // Control flag
+
+        factory.getContainerProperties().setConsumerRebalanceListener(new ConsumerRebalanceListener() {
+            @Override
+            public void onPartitionsAssigned(Collection<TopicPartition> partitions) {
+                if (resetOffsets.get() && !partitions.isEmpty()) {
+                    Consumer<?, ?> consumer = factory.getConsumerFactory().createConsumer();
+                    consumer.seekToBeginning(partitions);
+                    resetOffsets.set(false); // Only reset once
+                }
+            }
+
+            @Override
+            public void onPartitionsRevoked(Collection<TopicPartition> partitions) {
+                // Nothing needed here
+            }
+        });
         return factory;
     }
 
