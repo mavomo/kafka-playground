@@ -2,7 +2,9 @@ package com.playground.kafkaplayground.infra;
 
 import com.playground.kafkaplayground.domain.Inventory;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.listener.KafkaListenerErrorHandler;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -15,6 +17,7 @@ public class InventoryService {
 
     private final KafkaTemplate<String, Inventory> kafkaTemplate;
     private final ProductService productService;
+    private final InveCon
 
     public InventoryService(KafkaTemplate<String, Inventory> kafkaTemplate, ProductService productService) {
         this.kafkaTemplate = kafkaTemplate;
@@ -34,4 +37,15 @@ public class InventoryService {
             kafkaTemplate.send(record);
         });
     }
+
+    @KafkaListener(
+            topics = INVENTORY_CREATED_TOPIC,
+            groupId = "inventory-management",
+            containerFactory = "inventoryKafkaListenerContainerFactory"
+    )
+    public void listenInventoryFromBeginning(Inventory inventory) {
+        System.out.println("Received Inventory in group service: " + inventory.toString());
+    }
+
+    public void resetConsumer
 }

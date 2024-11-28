@@ -61,7 +61,13 @@ Ce système vise à rationaliser la supervision des stocks, réduire les rupture
 ### How to run
 > docker run -d --name kafka-playground-app -p 8080:8080 kafka-playground-app:latest
 
+### KStream Topology
+
+https://zz85.github.io/kafka-streams-viz/
+
 ### Kafka ACL's
+
+> https://docs.confluent.io/cloud/current/cp-component/streams-cloud-config.html
 
 # 1. Consumer Group ACLs
 confluent kafka acl create --allow \

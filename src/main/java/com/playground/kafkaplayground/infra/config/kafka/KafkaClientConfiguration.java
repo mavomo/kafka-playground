@@ -1,17 +1,21 @@
 package com.playground.kafkaplayground.infra.config.kafka;
 
+import com.playground.kafkaplayground.domain.Inventory;
 import org.apache.kafka.clients.CommonClientConfigs;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.config.SaslConfigs;
+import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.apache.kafka.streams.StreamsConfig;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.kafka.core.DefaultKafkaProducerFactory;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.core.ProducerFactory;
+import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
+import org.springframework.kafka.core.*;
 import org.springframework.kafka.support.LoggingProducerListener;
+import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
 import java.util.HashMap;
@@ -26,6 +30,43 @@ public class KafkaClientConfiguration<K, V> {
 
     public KafkaClientConfiguration(KafkaProperties kafkaProperties) {
         this.kafkaProperties = kafkaProperties;
+    }
+
+    @Bean
+    public ConsumerFactory<String, Inventory> inventoryConsumerFactory() {
+        Map<String, Object> properties = new HashMap<>();
+
+        // Connection
+        properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getBootstrapServers());
+
+        // SASL Authentication
+        properties.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, kafkaProperties.getSecurityProtocol());
+        properties.put(SaslConfigs.SASL_MECHANISM, kafkaProperties.getSaslMechanism());
+        properties.put(SaslConfigs.SASL_JAAS_CONFIG, String.format(
+                "org.apache.kafka.common.security.plain.PlainLoginModule required username='%s' password='%s';",
+                kafkaProperties.getJaasUsername(),
+                kafkaProperties.getJaasPassword()
+        ));
+
+        // Des
+        properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+        properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class.getName());
+        properties.put(
+                StreamsConfig.DEFAULT_DESERIALIZATION_EXCEPTION_HANDLER_CLASS_CONFIG,
+                ConsumerExceptionHandler.class.getName()
+        );
+
+        // Specific
+        properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+
+        return new DefaultKafkaConsumerFactory<>(properties);
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, Inventory> inventoryKafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, Inventory> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(inventoryConsumerFactory());
+        return factory;
     }
 
     @Bean

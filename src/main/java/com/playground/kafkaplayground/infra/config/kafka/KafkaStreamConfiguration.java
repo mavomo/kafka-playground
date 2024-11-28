@@ -1,5 +1,6 @@
 package com.playground.kafkaplayground.infra.config.kafka;
 
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.serialization.Serdes;
@@ -61,6 +62,9 @@ public class KafkaStreamConfiguration {
         properties.put(StreamsConfig.REPLICATION_FACTOR_CONFIG, 3);
         properties.put(ProducerConfig.ACKS_CONFIG, "all");
         properties.put(StreamsConfig.producerPrefix(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG), true);
+
+        properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+        properties.put(StreamsConfig.consumerPrefix(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG), "earliest");
 
         return new KafkaStreamsConfiguration(properties);
     }
